@@ -7,17 +7,30 @@ const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b8
 
 const updates = [
   {
-    version: 'v2.0.5',
+    version: 'v2.0.7',
     date: '07 Feb 2026',
     status: 'Latest',
+    title: 'Notification System Overhaul',
+    description: 'Implementasi sistem notifikasi komunitas yang cerdas dan fungsional.',
+    changes: [
+      'Interactive Alerts: Notifikasi kini dapat diklik untuk navigasi langsung ke detail konten.',
+      'Category Intelligence: Label otomatis (New Airing, Hot Movie, New ONA) pada setiap intel.',
+      'Compact Console: Redesign panel notifikasi agar lebih ramping dan efisien ruang.',
+      'Clean Architecture: Optimasi state management untuk sinkronisasi status baca (read/unread).'
+    ],
+    isMajor: false
+  },
+  {
+    version: 'v2.0.5',
+    date: '07 Feb 2026',
+    status: 'Legacy',
     title: 'The Big Refactor (CE)',
     description: 'Perombakan total arsitektur data dan standarisasi visual Community Edition.',
     changes: [
       'Universal Archive: Implementasi sistem 5 pilar (TV, Movie, Manga, Novel, Donghua).',
       'Branding Alignment: Standarisasi logo "W" dan tipografi tegak lurus sesuai protokol komunitas.',
       'Elite Component Switcher: Redesign sistem kartu adaptif (MovieCard, NovelCard, DonghuaCard).',
-      'Advanced Search: Implementasi console pencarian lintas kategori dengan sistem real-time matching.',
-      'Intelligence Refinement: Akurasi data 100% pada Taste Report dan Archive Analytics.'
+      'Advanced Search: Implementasi console pencarian lintas kategori dengan sistem real-time matching.'
     ],
     isMajor: true
   },
@@ -30,23 +43,9 @@ const updates = [
     changes: [
       'Cinematic Hero: Implementasi HD Gallery Carousel dengan sistem Ken Burns effect.',
       'Bento Architecture: Reorganisasi layout informasi detail dengan grid yang lebih presisi.',
-      'HD Asset Engine: Optimasi filter gambar untuk memastikan kualitas High-Definition di seluruh UI.',
-      'Balanced Space: Redesign tipografi (Max 4xl) untuk legibilitas standar komunitas terbaik.'
+      'HD Asset Engine: Optimasi filter gambar untuk memastikan kualitas High-Definition di seluruh UI.'
     ],
     isMajor: true
-  },
-  {
-    version: 'v1.9.9',
-    date: '07 Feb 2026',
-    status: 'Legacy',
-    title: 'Intelligence Sync',
-    description: 'Finalisasi fitur analitik selera pengguna dan laporan persona otomatis.',
-    changes: [
-      'Taste Profile: Implementasi Community Taste Report berbasis algoritma genre.',
-      'Performance: Optimasi rendering pada grid katalog besar.',
-      'UI Fixes: Pembersihan konflik visual pada elemen navigasi mobile.'
-    ],
-    isMajor: false
   },
   {
     version: 'v1.5.0',
@@ -95,7 +94,7 @@ onMounted(() => {
           Version<br/><span :style="{ color: primaryColor }">History.</span>
         </h1>
         <p class="mt-12 text-text-muted font-medium text-lg md:text-xl opacity-50 max-w-2xl leading-relaxed ">
-          Dokumentasi teknis perkembangan platform WibuPedia dari inisialisasi hingga <span class="text-white font-black">Refactor Release v2.0.5</span>.
+          Dokumentasi teknis perkembangan platform WibuPedia dari inisialisasi hingga <span class="text-white font-black">Stable Release v2.0.7</span>.
         </p>
       </header>
 
@@ -143,7 +142,7 @@ onMounted(() => {
 
               <div class="space-y-8 relative z-10">
                 <div v-for="change in update.changes" :key="change" class="flex gap-6 group/item">
-                  <div class="mt-2.5 w-1.5 h-1.5 rounded-full bg-white/10 shrink-0 transition-all group-hover/item:scale-150" :style="{ backgroundColor: group-hover/item ? primaryColor : '' }"></div>
+                  <div class="mt-2.5 w-1.5 h-1.5 rounded-full bg-white/10 shrink-0 transition-all group-hover/item:scale-150 group-hover/item:bg-white"></div>
                   <p class="text-sm md:text-base text-text-muted font-bold opacity-30 leading-snug group-hover/item:opacity-100 group-hover/item:text-white transition-all">{{ change }}</p>
                 </div>
               </div>
@@ -167,14 +166,11 @@ onMounted(() => {
 
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
-
 .animate-reveal { animation: revealUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 .animate-reveal-item { opacity: 0; animation: revealUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-
 @keyframes revealUp {
   from { opacity: 0; transform: translateY(60px); filter: blur(15px); }
   to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
-
 ::-webkit-scrollbar { display: none; }
 </style>
