@@ -28,7 +28,7 @@ defineProps({
           
           <div :style="{ backgroundColor: primaryColor }" 
                class="w-20 h-20 rounded-[2.5rem] flex items-center justify-center shadow-2xl relative z-10 animate-float-zen">
-            <span class="text-4xl font-black text-white italic tracking-tighter">W</span>
+            <span class="text-4xl font-black text-white select-none">W</span>
             <div class="absolute inset-0 rounded-[2.5rem] shadow-[inset_0_0_20px_rgba(255,255,255,0.3)]"></div>
           </div>
         </div>
@@ -72,7 +72,6 @@ defineProps({
 
 /* 🚀 ZEN ANIMATION ENGINE */
 
-/* Ripple Effect: Lingkaran yang memancar keluar */
 @keyframes ripple {
   0% { transform: scale(0.5); opacity: 0; }
   50% { opacity: 0.2; }
@@ -82,7 +81,6 @@ defineProps({
   animation: ripple 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
 }
 
-/* Floating Zen: Gerakan melayang halus */
 @keyframes float-zen {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
   50% { transform: translateY(-10px) rotate(2deg); }
@@ -91,7 +89,6 @@ defineProps({
   animation: float-zen 4s ease-in-out infinite;
 }
 
-/* Slide Up: Munculnya teks dari bawah */
 @keyframes slide-up {
   from { transform: translateY(100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
@@ -100,7 +97,6 @@ defineProps({
   animation: slide-up 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Slow Fade In */
 @keyframes fade-in-slow {
   from { opacity: 0; }
   to { opacity: 1; }
