@@ -14,8 +14,10 @@ const userStore = useUserStore()
 
 const { selectedItem, loading, fetchDetail } = useJikan()
 
-// --- 🎞️ HD GALLERY ENGINE ---
+// --- 🎞️ ENGINE STATES ---
 const gallery = ref([])
+const characters = ref([])
+const staff = ref([])
 const activeGalleryIdx = ref(0)
 const category = computed(() => route.params.type || 'anime')
 const toast = ref({ show: false, message: '' })
@@ -34,27 +36,32 @@ const triggerToast = (msg) => {
 
 onMounted(async () => {
   const apiType = category.value === 'manga' || category.value === 'novel' ? 'manga' : 'anime'
+  const id = route.params.id
+
+  // 1. Fetch Core Data
+  await fetchDetail(id, apiType)
   
-  // 1. Load Main Data
-  await fetchDetail(route.params.id, apiType)
-  
-  // 2. Fetch HD Gallery
+  // 2. Parallel Fetch: Gallery, Characters, Staff
   try {
-    const res = await fetch(`https://api.jikan.moe/v4/${apiType}/${route.params.id}/pictures`)
-    const result = await res.json()
-    if (result.data && result.data.length > 0) {
-      // Filter & Map specifically for HD/Large URLs
-      gallery.value = result.data.map(img => ({
-        url: img.jpg?.large_image_url || img.jpg?.image_url || img.image_url
-      })).slice(0, 8)
-    }
+    const [resGallery, resChars, resStaff] = await Promise.all([
+      fetch(`https://api.jikan.moe/v4/${apiType}/${id}/pictures`),
+      fetch(`https://api.jikan.moe/v4/${apiType}/${id}/characters`),
+      fetch(`https://api.jikan.moe/v4/${apiType}/${id}/staff`)
+    ])
+
+    const [dataG, dataC, dataS] = await Promise.all([
+      resGallery.json(), resChars.json(), resStaff.json()
+    ])
+
+    gallery.value = dataG.data?.map(img => ({ url: img.jpg?.large_image_url || img.image_url })).slice(0, 8) || []
+    characters.value = dataC.data?.slice(0, 12) || []
+    staff.value = dataS.data?.slice(0, 8) || []
   } catch (e) { 
-    console.error("Gallery Sync Offline") 
+    console.error("Encyclopedia Sync Offline") 
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' })
   
-  // 3. Cycle Timer
   carouselTimer = setInterval(() => {
     if (gallery.value.length > 0) {
       activeGalleryIdx.value = (activeGalleryIdx.value + 1) % gallery.value.length
@@ -153,9 +160,22 @@ const handleLibraryAction = () => {
                   <span class="text-xl font-black italic tracking-tighter tabular-nums" :style="{ color: info.color || 'white' }">{{ info.val }}</span>
                </div>
             </div>
+
+            <div v-if="staff.length" class="p-8 bg-white/[0.02] border border-white/5 rounded-[2.5rem] space-y-6">
+               <h4 class="text-[10px] font-black text-white/20 uppercase tracking-widest italic">Production Staff</h4>
+               <div class="space-y-4">
+                  <div v-for="person in staff" :key="person.person.mal_id" class="flex items-center gap-4">
+                     <img :src="person.person.images.jpg.image_url" class="w-10 h-10 rounded-full object-cover grayscale hover:grayscale-0 transition-all" />
+                     <div class="overflow-hidden">
+                        <p class="text-[11px] font-black text-white truncate">{{ person.person.name }}</p>
+                        <p class="text-[9px] text-white/30 truncate uppercase">{{ person.positions[0] }}</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
           </div>
 
-          <div class="lg:col-span-8 space-y-12 lg:pt-16">
+          <div class="lg:col-span-8 space-y-16 lg:pt-16">
             <div class="space-y-6">
                <div class="flex items-center gap-4">
                   <span :style="{ color: accentColor }" class="text-[10px] font-black uppercase tracking-[0.6em]">{{ selectedItem.type }}</span>
@@ -190,6 +210,22 @@ const handleLibraryAction = () => {
                </div>
             </div>
 
+            <div v-if="characters.length" class="space-y-8 pt-6">
+               <div class="flex items-center gap-4">
+                 <h2 class="text-xs font-black uppercase tracking-[0.5em] text-white/30 italic">Characters Hub</h2>
+                 <div class="flex-grow h-px bg-white/5"></div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                 <div v-for="char in characters" :key="char.character.mal_id" class="group/char relative">
+                    <div class="aspect-[1/1.2] rounded-[1.5rem] overflow-hidden border border-white/5 mb-3 bg-dark-surface shadow-lg">
+                       <img :src="char.character.images.webp.image_url" class="w-full h-full object-cover group-hover/char:scale-110 transition-transform duration-700 saturate-50 group-hover/char:saturate-100" />
+                    </div>
+                    <p class="text-[11px] font-black text-white uppercase truncate">{{ char.character.name }}</p>
+                    <p class="text-[9px] text-white/30 uppercase tracking-widest">{{ char.role }}</p>
+                 </div>
+              </div>
+            </div>
+
             <div v-if="category === 'anime' && selectedItem.trailer?.embed_url" class="space-y-8 pt-6">
                <h2 class="text-xs font-black uppercase tracking-[0.5em] text-white/30 italic">Media Showcase</h2>
                <div class="aspect-video rounded-[3rem] overflow-hidden border border-white/5 bg-black shadow-2xl">
@@ -198,7 +234,7 @@ const handleLibraryAction = () => {
             </div>
 
             <div class="space-y-8">
-               <h2 class="text-xs font-black uppercase tracking-[0.5em] text-white/30 italic">Genre</h2>
+               <h2 class="text-xs font-black uppercase tracking-[0.5em] text-white/30 italic">Genre DNA</h2>
                <div class="flex flex-wrap gap-2.5">
                   <span v-for="genre in selectedItem.genres" :key="genre.mal_id"
                         class="px-5 py-2.5 bg-white/[0.03] border border-white/5 rounded-full text-[9px] font-black text-white/40 uppercase tracking-widest hover:bg-white hover:text-black transition-all">
@@ -207,12 +243,13 @@ const handleLibraryAction = () => {
                </div>
             </div>
           </div>
+
         </div>
       </section>
 
       <footer class="max-w-7xl mx-auto px-8 mt-48 pt-20 border-t border-white/5 flex justify-between items-center opacity-10">
-         <p class="text-[9px] font-black uppercase tracking-[1em]">WibuPedia High-Fidelity</p>
-         <p class="text-[9px] font-black uppercase tracking-[0.5em]">2026</p>
+         <p class="text-[9px] font-black uppercase tracking-[1em]">WibuPedia Digital Archive</p>
+         <p class="text-[9px] font-black uppercase tracking-[0.5em]">System Build 2026</p>
       </footer>
 
     </div>
@@ -222,7 +259,6 @@ const handleLibraryAction = () => {
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
 
-/* 🚀 HD FADE GALLERY */
 .fade-gallery-enter-active { transition: opacity 2s ease-in-out; }
 .fade-gallery-leave-active { transition: opacity 1.5s ease-in-out; }
 .fade-gallery-enter-from, .fade-gallery-leave-to { opacity: 0; }
@@ -235,4 +271,9 @@ const handleLibraryAction = () => {
 
 .toast-pop-enter-active, .toast-pop-leave-active { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .toast-pop-enter-from { opacity: 0; transform: translate(-50%, -40px); }
+
+/* Custom Scrollbar for better UI */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
 </style>
