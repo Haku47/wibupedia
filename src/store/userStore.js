@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { useLibraryStore } from './LibraryStore' // 🛡️ Import Library untuk DNA Scan
+import { useLibraryStore } from '@/store/libraryStore.js' // WAJIB tambahkan .jsport Library Store for cross-store access
 
 export const useUserStore = defineStore('user', () => {
   const libraryStore = useLibraryStore()
