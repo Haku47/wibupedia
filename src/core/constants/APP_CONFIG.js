@@ -6,7 +6,7 @@
 export const APP_CONFIG = {
   // --- INFORMASI DASAR (Identity Core) ---
   NAME: import.meta.env.VITE_APP_NAME || 'WibuPedia',
-  VERSION: '2.0.5',
+  VERSION: '2.0.7',
   STATUS: 'STABLE', // 'BETA' | 'STABLE' | 'LATEST' | 'MAINTENANCE'
   DESCRIPTION: 'Arsip digital personal untuk eksplorasi anime, manga, dan novel.',
   DEVELOPER: 'Alviensyah Mohammad',
