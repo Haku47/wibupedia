@@ -1,8 +1,10 @@
 import { ref } from 'vue'
 import { animeService, mangaService } from '@/api/jikan'
 
-// Singleton Controller untuk Abort Protocol
+// Singleton States (Shared across components)
 let abortController = null
+const characterCache = new Map()
+const staffCache = new Map()
 
 export function useJikan() {
   const items = ref([])
@@ -16,17 +18,14 @@ export function useJikan() {
     lastVisiblePage: 1
   })
 
-  // 🛡️ v1.9.6 EXPLICIT GENRE EXCLUSION (NSFW Blocklist)
-  // 12: Hentai, 49: Erotica, 28: Boys Love, 26: Girls Love
+  // 🛡️ v2.0.0 NSFW Blocklist
   const BLACKLIST_GENRES = '12,49,28,26'
 
-  // --- INTERNAL CORE ENGINE ---
+  // --- ⚡ INTERNAL REQUEST ENGINE ---
   const executeRequest = async (requestPromise, append = false) => {
-    if (abortController) {
-      abortController.abort()
-    }
-    
+    if (abortController) abortController.abort()
     abortController = new AbortController()
+    
     loading.value = true
     error.value = null
 
@@ -34,11 +33,7 @@ export function useJikan() {
       const response = await requestPromise
       const rawData = response.data || []
       
-      if (append) {
-        items.value = [...items.value, ...rawData]
-      } else {
-        items.value = rawData
-      }
+      items.value = append ? [...items.value, ...rawData] : rawData
 
       if (response.pagination) {
         pagination.value = {
@@ -52,62 +47,39 @@ export function useJikan() {
       if (err.name === 'CanceledError' || err.name === 'AbortError') return null
       error.value = err.response?.data?.message || 'Gagal terhubung ke database Jikan.'
       console.error("Jikan API Error:", err)
-      throw err 
+      return null
     } finally {
       loading.value = false
     }
   }
 
-  // --- METHODS (ENFORCED SAFE PROTOCOL) ---
-  
+  // --- 🏗️ METHODS ---
+
   const fetchTrending = (type = 'anime', page = 1, filterType = 'airing', append = false) => {
-    // 🛡️ FIX: Inject SFW & Explicit Exclusion
-    const params = { 
-      page, 
-      filter: filterType,
-      sfw: true // Force Safe For Work
-    }
-    
-    const service = type === 'anime' 
-      ? animeService.getTopAnime(params) 
-      : mangaService.getTopManga(params)
-      
+    const params = { page, filter: filterType, sfw: true }
+    const service = type === 'anime' ? animeService.getTopAnime(params) : mangaService.getTopManga(params)
     return executeRequest(service, append)
   }
 
   const fetchSeasonal = (page = 1, append = false) => {
-    // 🛡️ FIX: Inject SFW global
-    const params = { 
-      page, 
-      sfw: true,
-      filter: 'tv' // Biasanya seasonal lebih aman difilter ke tipe TV
-    }
+    const params = { page, sfw: true, filter: 'tv' }
     return executeRequest(animeService.getSeasonalAnime(params), append)
   }
 
   const search = (query, type = 'anime', filterParams = {}, page = 1, append = false) => {
     const hasActiveFilters = filterParams.genres?.length > 0 || filterParams.status || filterParams.rating
-    
-    if (!query && !hasActiveFilters) {
-      clear()
-      return
-    }
-
+    if (!query && !hasActiveFilters) { clear(); return }
     if (query && query.length < 3 && !hasActiveFilters) return
 
-    // 🛡️ SHIELD: Flatting all params + Enforce SFW & Exclusion
     const flatParams = {
       q: query || undefined,
       page: page,
-      sfw: true, // 🛡️ GLOBAL SAFEGUARD
-      genres_exclude: BLACKLIST_GENRES, // 🛡️ EXPLICIT EXCLUSION
+      sfw: true,
+      genres_exclude: BLACKLIST_GENRES,
       ...filterParams
     }
 
-    const service = type === 'anime' 
-      ? animeService.searchAnime(flatParams) 
-      : mangaService.searchManga(flatParams)
-      
+    const service = type === 'anime' ? animeService.searchAnime(flatParams) : mangaService.searchManga(flatParams)
     return executeRequest(service, append)
   }
 
@@ -120,30 +92,57 @@ export function useJikan() {
         ? await animeService.getAnimeDetails(id) 
         : await mangaService.getMangaDetails(id)
       
-      // 🛡️ DETAIL GUARD: Jika data mengandung rating NSFW, batalkan display
       const rating = response.data?.rating || ''
       if (rating.includes('Rx') || rating.includes('R+')) {
-        error.value = 'Access Denied: Content violates safety protocol.'
+        error.value = 'Access Denied: Safety Protocol.'
         return
       }
-
       selectedItem.value = response.data
     } catch (err) {
-      error.value = `Gagal memuat detail ${type}.`
+      error.value = `Gagal memuat detail.`
     } finally {
       loading.value = false
     }
+  }
+
+  // --- 👥 NEW: ENHANCED DATA METHODS ---
+  // Fungsi helper untuk delay demi mencegah 429
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+  const fetchCharacters = async (id, type = 'anime') => {
+    const cacheKey = `${type}-${id}`
+    if (characterCache.has(cacheKey)) return characterCache.get(cacheKey)
+
+    try {
+      await sleep(500) // ⏳ Jeda 500ms untuk anti-spam
+      const res = await fetch(`https://api.jikan.moe/v4/${type}/${id}/characters`)
+      const json = await res.json()
+      characterCache.set(cacheKey, json.data || [])
+      return json.data || []
+    } catch (e) { return [] }
+  }
+
+  const fetchStaff = async (id, type = 'anime') => {
+    const cacheKey = `${type}-${id}`
+    if (staffCache.has(cacheKey)) return staffCache.get(cacheKey)
+
+    try {
+      await sleep(1000) // ⏳ Jeda lebih lama untuk staff
+      const res = await fetch(`https://api.jikan.moe/v4/${type}/${id}/staff`)
+      const json = await res.json()
+      staffCache.set(cacheKey, json.data || [])
+      return json.data || []
+    } catch (e) { return [] }
   }
 
   const clear = () => {
     if (abortController) abortController.abort()
     items.value = []
     selectedItem.value = null
-    error.value = null
   }
 
   return {
     items, selectedItem, pagination, loading, error,
-    fetchTrending, fetchSeasonal, search, fetchDetail, clear
+    fetchTrending, fetchSeasonal, search, fetchDetail, fetchCharacters, fetchStaff, clear
   }
 }
