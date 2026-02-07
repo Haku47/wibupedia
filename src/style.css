@@ -1,0 +1,99 @@
+/* src/style.css */
+@import "tailwindcss";
+
+@theme {
+  /* --- Warna Identitas WibuPedia --- */
+  --color-brand-primary: #3b82f6;
+  --color-brand-secondary: #60a5fa;
+  --color-brand-accent: #22d3ee;
+  
+  /* --- Tema Gelap (Dark Mode Palette) --- */
+  --color-dark-bg: #0f172a;
+  --color-dark-surface: #1e293b;
+  --color-dark-border: #334155;
+  --color-dark-card: rgba(30, 41, 59, 0.7);
+
+  /* --- Tipografi & Teks --- */
+  --color-text-main: #f8fafc;
+  --color-text-muted: #94a3b8;
+
+  /* --- Animasi & Radius --- */
+  --radius-wibu: 1rem;
+  --animate-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@layer base {
+  :root {
+    --bg-app: #0f172a;
+    --accent: #3b82f6;
+    /* Menghilangkan delay highlight pada mobile saat di-tap */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-dark-bg text-text-main overflow-x-hidden;
+    /* Menggunakan font Outfit yang kita pasang di index.html */
+    font-family: 'Inter', 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Optimalisasi input untuk mobile agar tidak zoom otomatis saat fokus */
+  input, textarea {
+    @apply text-base;
+  }
+}
+
+@layer components {
+  /* Container Responsive yang lebih lega */
+  .container-wibu {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Card Glassmorphism untuk mobile agar terlihat modern */
+  .glass-card {
+    @apply bg-dark-surface/60 backdrop-blur-md border border-dark-border/50;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar tapi tetap bisa scroll (bagus untuk slider genre mobile) */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Safe Area Padding untuk HP berponi (Notch) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Grid yang menyesuaikan layar dengan cerdas */
+  .grid-anime {
+    @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6;
+  }
+}
+
+/* --- Custom Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 5px; /* Lebih tipis agar terlihat elegan */
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-border rounded-full hover:bg-brand-primary/50 transition-all;
+}
+
+/* --- Mobile Hover Fix --- */
+/* Mencegah sticky hover di layar sentuh */
+@media (hover: hover) {
+  .hover-trigger:hover {
+    @apply scale-105 border-brand-primary;
+  }
+}

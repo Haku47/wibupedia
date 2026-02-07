@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WibuPedia Asset Gen v2.3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background: #0b0f1a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .card { background: #161d2f; padding: 40px; border-radius: 3.5rem; border: 1px solid rgba(255,255,255,0.05); text-align: center; box-shadow: 0 40px 100px rgba(0,0,0,0.5); max-width: 500px; }
+        canvas { border: 4px solid #3b82f6; border-radius: 2.5rem; background: #0f172a; margin-bottom: 25px; box-shadow: 0 0 40px rgba(59,130,246,0.15); }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { padding: 14px 15px; background: #3b82f6; color: white; border: none; border-radius: 1.2rem; cursor: pointer; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; font-size: 11px; }
+        button.svg-btn { background: #10b981; }
+        button:hover { filter: brightness(1.2); transform: translateY(-3px); }
+        p { opacity: 0.4; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <p>WibuPedia System Asset</p>
+        <h2 style="margin: 0 0 25px 0; font-style: italic; font-weight: 900;">CONVERT PNG TO SVG</h2>
+        
+        <canvas id="canvas512" width="512" height="512"></canvas>
+        
+        <div class="btn-group">
+            <button onclick="download(512)">Save PNG</button>
+            <button class="svg-btn" onclick="convertAndDownloadSVG()">Convert PNG to SVG</button>
+        </div>
+        
+        <p style="margin-top: 25px;">Status: <span id="status" style="color: #10b981;">Dragon Ready</span></p>
+    </div>
+
+    <script>
+        // Setup awal canvas (Dragon fa-solid)
+        function draw() {
+            const canvas = document.getElementById('canvas512');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, 512, 512);
+            ctx.fillStyle = '#3b82f6';
+            ctx.font = '900 280px "Font Awesome 6 Free"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('\uf6d5', 256, 265);
+        }
+
+        // Jalankan draw saat load
+        setTimeout(draw, 1000);
+
+        function download(size) {
+            const canvas = document.getElementById('canvas512');
+            const link = document.createElement('a');
+            link.download = `pwa-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // --- FUNGSI CONVERT OTOMATIS ---
+        function convertAndDownloadSVG() {
+            const canvas = document.getElementById('canvas512');
+            // Ambil data PNG dari canvas sebagai Base64
+            const pngData = canvas.toDataURL('image/png');
+
+            // Bungkus PNG ke dalam template SVG
+            const svgContent = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
+    <image width="512" height="512" xlink:href="${pngData}"/>
+</svg>`.trim();
+
+            const blob = new Blob([svgContent], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "favicon.svg";
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
