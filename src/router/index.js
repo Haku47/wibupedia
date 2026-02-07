@@ -52,12 +52,6 @@ const routes = [
     }
   },
   {
-    path: '/trending',
-    nama: 'trending',
-    component: () => import('@/pages/Trending.vue'),
-    meta: { title: 'Trending - Wibupedia'}
-  },
-  {
     path: '/library',
     name: 'library',
     component: () => import('@/pages/User/Library.vue'),
