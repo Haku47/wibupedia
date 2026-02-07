@@ -21,7 +21,7 @@ onMounted(() => {
           <div :style="{ backgroundColor: primaryColor }" class="w-10 h-1 rounded-full shadow-lg"></div>
           <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Data Transparency</span>
         </div>
-        <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.9] italic">
+        <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.9] ">
           Privacy<br/><span :style="{ color: primaryColor }">Policy.</span>
         </h1>
         <p class="mt-10 text-text-muted font-medium text-lg leading-relaxed opacity-60 max-w-2xl">
@@ -44,7 +44,7 @@ onMounted(() => {
               <i class="fa-solid fa-database text-2xl"></i>
             </div>
             <div>
-              <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter italic">Personal Collection</h2>
+              <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter ">Personal Collection</h2>
               <p class="text-text-muted leading-relaxed font-medium mb-10 opacity-70 text-base">
                 Seluruh data koleksi yang Anda simpan di kategori <b>Anime, Manga, dan Novel</b> dikelola menggunakan teknologi <i>Browser LocalStorage</i>. Kami tidak menyimpan data Anda di server kami sendiri.
               </p>
@@ -75,7 +75,7 @@ onMounted(() => {
               <i class="fa-solid fa-server text-2xl"></i>
             </div>
             <div>
-              <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter italic text-emerald-500">Service Performance</h2>
+              <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter  text-emerald-500">Service Performance</h2>
               <p class="text-text-muted leading-relaxed font-medium mb-8 opacity-70">
                 Kami menggunakan data teknis anonim untuk memastikan pengalaman eksplorasi Anda tetap lancar dan responsif:
               </p>
@@ -105,7 +105,7 @@ onMounted(() => {
               <i class="fa-solid fa-link text-2xl"></i>
             </div>
             <div>
-              <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter italic text-amber-500">Third-Party Archive</h2>
+              <h2 class="text-3xl font-black mb-6 uppercase tracking-tighter  text-amber-500">Third-Party Archive</h2>
               <p class="text-text-muted leading-relaxed font-medium opacity-70 text-base mb-8">
                 WibuPedia menggunakan infrastruktur <b>Jikan API</b> (Un-official MyAnimeList API) untuk menyajikan data katalog terlengkap.
               </p>
@@ -120,7 +120,7 @@ onMounted(() => {
 
         <section class="px-10 py-20 bg-white/[0.02] border-2 border-dashed border-white/10 rounded-[4rem] text-center relative overflow-hidden group">
           <div class="absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity" :style="{ backgroundColor: primaryColor }"></div>
-          <h2 class="text-4xl font-black mb-6 uppercase tracking-tighter italic">Total User Control</h2>
+          <h2 class="text-4xl font-black mb-6 uppercase tracking-tighter ">Total User Control</h2>
           <p class="text-text-muted font-medium mb-12 max-w-2xl mx-auto opacity-60 text-base leading-relaxed">
             Anda adalah pemilik tunggal atas data koleksi Anda. WibuPedia menyediakan fitur penghapusan data secara instan melalui menu Pengaturan.
           </p>

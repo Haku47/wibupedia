@@ -6,10 +6,10 @@
 export const APP_CONFIG = {
   // --- INFORMASI DASAR (Identity Core) ---
   NAME: import.meta.env.VITE_APP_NAME || 'WibuPedia',
-  VERSION: '2.0.0',
+  VERSION: '2.0.5',
   STATUS: 'STABLE', // 'BETA' | 'STABLE' | 'LATEST' | 'MAINTENANCE'
   DESCRIPTION: 'Arsip digital personal untuk eksplorasi anime, manga, dan novel.',
-  DEVELOPER: 'Malangan Dev',
+  DEVELOPER: 'Alviensyah Mohammad',
   REGION: 'Malang, ID',
   
   // --- PROTOKOL API (Jikan V4 Sync) ---

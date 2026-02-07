@@ -2,10 +2,10 @@ import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 
 export const useLibraryStore = defineStore('library', () => {
-  // --- Configuration ---
-  const STORAGE_KEY = 'wibupedia_lib_v2'
-  const LOG_KEY = 'wibupedia_logs'
-  const HISTORY_KEY = 'wibupedia_recent_views'
+  // --- Archive Configuration (Community Edition) ---
+  const STORAGE_KEY = 'wibupedia_archive_ce'
+  const LOG_KEY = 'wibupedia_logs_ce'
+  const HISTORY_KEY = 'wibupedia_history_ce'
 
   // --- Initial State ---
   const getInitialLibrary = () => {
@@ -24,7 +24,7 @@ export const useLibraryStore = defineStore('library', () => {
   }, { deep: true })
 
   watch(logs, (newLogs) => {
-    // Keep only the last 50 activities to save space
+    // Community Limit: Simpan 50 aktivitas terbaru
     localStorage.setItem(LOG_KEY, JSON.stringify(newLogs.slice(0, 50)))
   }, { deep: true })
 
@@ -59,39 +59,36 @@ export const useLibraryStore = defineStore('library', () => {
     
     const topGenres = Object.entries(genreCounts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
+      .slice(0, 5) // CE Update: Pantau 5 genre teratas
       
-    return { total, avgScore, topGenres, hasEnoughData: topGenres.length > 0 }
+    return { total, avgScore, topGenres, hasEnoughData: total >= 5 }
   })
 
-  // --- ✨ COMMUNITY TASTE REPORT ENGINE ---
+  // --- ✨ COMMUNITY TASTE REPORT ENGINE (CE REFINED) ---
   const tasteReport = computed(() => {
-    if (myLibrary.value.length < 5) return null
+    if (!vaultStats.value || vaultStats.value.total < 5) return null
 
     const stats = vaultStats.value
     const topGenre = stats.topGenres[0][0]
     const avgScore = parseFloat(stats.avgScore)
 
-    // Modern Persona Mapping
-    let persona = "The Multi-Genre Explorer"
-    let description = "Koleksi Anda menunjukkan selera yang sangat beragam. Anda tipe penikmat cerita yang terbuka pada segala jenis petualangan."
+    // CE Persona Mapping
+    let persona = "The Universal Curator"
+    let description = "Archive Anda menunjukkan selera yang sangat seimbang. Anda menikmati cerita dari berbagai dimensi tanpa batas genre."
 
-    if (topGenre === 'Action' || topGenre === 'Adventure') {
-      persona = "The Thrill Seeker"
-      description = "Anda sangat menyukai adrenalin dan narasi penuh semangat. Koleksi Anda didominasi oleh kisah-kisah yang membangkitkan energi."
-    } else if (topGenre === 'Romance' || topGenre === 'Slice of Life' || topGenre === 'Drama') {
-      persona = "The Emotionally Driven"
-      description = "Anda cenderung mencari kedalaman emosional dan makna dalam kehidupan sehari-hari. Koleksi ini adalah cerminan dari empati Anda."
-    } else if (topGenre === 'Fantasy' || topGenre === 'Sci-Fi') {
-      persona = "The Imaginative Dreamer"
-      description = "Dunia nyata saja tidak cukup untuk Anda. Anda sangat mengagumi pembangunan dunia yang kompleks dan imajinasi tanpa batas."
-    } else if (topGenre === 'Comedy') {
-      persona = "The Lighthearted Soul"
-      description = "Bagi Anda, hiburan adalah obat terbaik. Koleksi Anda dipenuhi oleh keceriaan yang mampu mencerahkan suasana."
+    if (['Action', 'Adventure', 'Fantasy'].includes(topGenre)) {
+      persona = "The Mythic Seeker"
+      description = "Anda menyukai narasi epik dan pembangunan dunia yang megah. Koleksi Anda didominasi oleh semangat petualangan yang tak padam."
+    } else if (['Romance', 'Slice of Life', 'Drama'].includes(topGenre)) {
+      persona = "The Soul Archivist"
+      description = "Kedalaman emosional adalah prioritas Anda. Setiap judul dalam koleksi ini mencerminkan apresiasi Anda terhadap sisi kemanusiaan."
+    } else if (['Mystery', 'Suspense', 'Horror'].includes(topGenre)) {
+      persona = "The Shadow Observer"
+      description = "Anda tertarik pada teka-teki dan atmosfer yang mendalam. Archive Anda penuh dengan rahasia yang menunggu untuk diungkap."
     }
 
-    // Quality Leveling
-    const tasteLevel = avgScore > 8.5 ? "Master Curator" : (avgScore > 7.5 ? "Dedicated Fan" : "Casual Enthusiast")
+    // Community Tiering
+    const tasteLevel = avgScore >= 8.5 ? "Grandmaster" : (avgScore >= 7.5 ? "Expert" : "Enthusiast")
     
     return { 
       persona, 
@@ -133,7 +130,7 @@ export const useLibraryStore = defineStore('library', () => {
   const exportLibrary = () => {
     try {
       const data = JSON.stringify({
-        source: 'WibuPedia Community Hub',
+        source: 'WibuPedia Community Edition',
         version: '2.6.0',
         exportDate: new Date().toISOString(),
         payload: myLibrary.value
@@ -143,7 +140,7 @@ export const useLibraryStore = defineStore('library', () => {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `WibuPedia_Collection_${new Date().toISOString().slice(0, 10)}.json`)
+      link.setAttribute('download', `WibuPedia_Archive_CE_${new Date().toISOString().slice(0, 10)}.json`)
       link.style.display = 'none'
       document.body.appendChild(link)
       link.click()
@@ -153,7 +150,7 @@ export const useLibraryStore = defineStore('library', () => {
         window.URL.revokeObjectURL(url)
       }, 100)
       
-      pushLog('EXPORT', 'Koleksi Berhasil Dicadangkan')
+      pushLog('EXPORT', 'Archive Backup Created')
       return true
     } catch (err) { return false }
   }
@@ -167,7 +164,7 @@ export const useLibraryStore = defineStore('library', () => {
           const data = content.payload || content
           if (Array.isArray(data)) {
             myLibrary.value = data
-            pushLog('IMPORT', `Koleksi Dipulihkan (${data.length} item)`)
+            pushLog('IMPORT', `Archive Restored (${data.length} items)`)
             resolve(true)
           } else { reject(new Error("Invalid format")) }
         } catch (err) { reject(err) }
@@ -180,9 +177,20 @@ export const useLibraryStore = defineStore('library', () => {
     if (!item || !item.mal_id) return
     if (!isInLibrary(item.mal_id)) {
       const typeUpper = item.type?.toUpperCase() || ''
-      const isNovel = typeUpper.includes('NOVEL')
-      const isMangaEntity = ['MANGA', 'ONE-SHOT', 'DOUJINSHI', 'MANHWA', 'MANHUA'].includes(typeUpper) || !!item.chapters
-      let mainCategory = isNovel ? 'novel' : (isMangaEntity ? 'manga' : 'anime')
+      
+      // 🛡️ v2.6.0 CE: Improved Auto-Categorization
+      let mainCategory = 'anime'
+      const mangaTypes = ['MANGA', 'ONE-SHOT', 'DOUJINSHI', 'MANHWA', 'MANHUA']
+      
+      if (typeUpper.includes('NOVEL')) {
+        mainCategory = 'novel'
+      } else if (mangaTypes.includes(typeUpper)) {
+        mainCategory = 'manga'
+      } else if (typeUpper === 'MOVIE') {
+        mainCategory = 'anime' // UI will handle MovieCard
+      } else if (typeUpper === 'ONA') {
+        mainCategory = 'anime' // UI will handle DonghuaCard
+      }
 
       const normalizedData = {
         mal_id: item.mal_id,
@@ -213,8 +221,8 @@ export const useLibraryStore = defineStore('library', () => {
   const isInLibrary = (id) => myLibrary.value.some(item => item.mal_id === id)
 
   const clearLibrary = () => {
-    if (confirm('Hapus seluruh koleksi di dalam Library?')) {
-      pushLog('PURGE', 'Pembersihan Seluruh Koleksi')
+    if (confirm('Bersihkan seluruh catatan archive? Tindakan ini tidak bisa dibatalkan.')) {
+      pushLog('PURGE', 'Archive Reset')
       myLibrary.value = []
     }
   }

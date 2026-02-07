@@ -8,13 +8,16 @@ const route = useRoute()
 const userStore = useUserStore()
 const currentYear = new Date().getFullYear()
 
-// 🛡️ v2.3.1: Auto-Hide Logic
+// 🛡️ v2.6.5 CE: Auto-Hide Logic
 const isAuthPage = computed(() => {
   const authRoutes = ['/auth', '/login', '/register']
   return authRoutes.includes(route.path)
 })
 
 const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
+
+// 🚀 CE FUNCTION: Mendapatkan versi terbaru dari config pusat
+const currentVersion = computed(() => APP_CONFIG.VERSION || 'v2.6.5 CE')
 
 const getSocialIcon = (platform) => {
   const icons = {
@@ -39,8 +42,7 @@ const linkGroups = {
     { name: 'About Us', path: '/about' },
     { name: 'Privacy Policy', path: '/privacy' },
     { name: 'Changelog', path: '/changelog' },
-    { name: 'Contact', path: '/contact' },
-    { name: 'Disclaimer', path: '/disclaimer' }
+    { name: 'Contact', path: '/contact' }
   ],
   ecosystem: [
     { name: 'Jikan API', url: 'https://jikan.moe/' },
@@ -63,12 +65,12 @@ const linkGroups = {
             <RouterLink to="/" class="inline-flex items-center gap-5 group mb-8">
               <div :style="{ backgroundColor: primaryColor }"
                    class="w-14 h-14 rounded-3xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-all duration-700 border border-white/10 group-hover:scale-110">
-                <span class="text-white font-black text-2xl italic tracking-tighter">W</span>
+                <span class="text-white font-black text-2xl leading-none select-none">W</span>
               </div>
-              <div class="flex flex-col">
-                <span class="text-3xl font-black tracking-tighter text-white uppercase italic leading-none">
+              <div class="hidden sm:flex flex-col text-white">
+                <h1 class="text-lg font-black tracking-tighter leading-none uppercase">
                   Wibu<span :style="{ color: primaryColor }">Pedia</span>
-                </span>
+                </h1>
                 <span class="text-[8px] font-black uppercase tracking-[0.6em] text-white/20 mt-2">Community Hub</span>
               </div>
             </RouterLink>
@@ -79,11 +81,11 @@ const linkGroups = {
           </div>
 
           <div class="flex flex-wrap justify-center md:justify-start gap-4">
-            <div class="px-5 py-2 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center gap-3 group/v">
+            <div class="px-5 py-2 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center gap-3 group/v transition-all hover:bg-white/[0.06]">
               <div class="w-1.5 h-1.5 rounded-full animate-pulse" :style="{ backgroundColor: primaryColor }"></div>
-              <span class="text-[10px] text-white font-black tracking-widest tabular-nums">{{ APP_CONFIG.VERSION }}</span>
+              <span class="text-[10px] text-white font-black tracking-widest tabular-nums">{{ currentVersion }}</span>
               <div class="h-3 w-px bg-white/10"></div>
-              <span class="text-[8px] font-black uppercase tracking-widest text-text-muted opacity-40">Stable Build</span>
+              <span class="text-[8px] font-black uppercase tracking-widest text-text-muted opacity-40">Build Stable</span>
             </div>
           </div>
           
@@ -127,10 +129,9 @@ const linkGroups = {
 
       <div class="border-t border-white/5 mt-28 pt-12">
         <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-          
           <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8">
             <p class="text-[11px] text-text-muted font-black tracking-widest opacity-20 uppercase">
-              &copy; {{ currentYear }} • Malangan Dev Team
+              &copy; {{ currentYear }} • {{ APP_CONFIG.DEVELOPER }}. All Rights Reserved.
             </p>
             <div class="hidden md:block h-4 w-px bg-white/5"></div>
             <div class="flex items-center gap-3 group">
@@ -139,7 +140,6 @@ const linkGroups = {
               <span class="text-[10px] text-text-muted font-bold opacity-30 uppercase tracking-widest">in Malang, ID</span>
             </div>
           </div>
-          
         </div>
       </div>
     </div>
@@ -149,7 +149,6 @@ const linkGroups = {
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
 li { list-style: none; }
-
 .footer-root a, .footer-root button {
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }

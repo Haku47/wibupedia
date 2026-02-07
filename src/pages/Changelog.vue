@@ -7,9 +7,24 @@ const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b8
 
 const updates = [
   {
-    version: 'v2.0.0',
+    version: 'v2.0.5',
     date: '07 Feb 2026',
     status: 'Latest',
+    title: 'The Big Refactor (CE)',
+    description: 'Perombakan total arsitektur data dan standarisasi visual Community Edition.',
+    changes: [
+      'Universal Archive: Implementasi sistem 5 pilar (TV, Movie, Manga, Novel, Donghua).',
+      'Branding Alignment: Standarisasi logo "W" dan tipografi tegak lurus sesuai protokol komunitas.',
+      'Elite Component Switcher: Redesign sistem kartu adaptif (MovieCard, NovelCard, DonghuaCard).',
+      'Advanced Search: Implementasi console pencarian lintas kategori dengan sistem real-time matching.',
+      'Intelligence Refinement: Akurasi data 100% pada Taste Report dan Archive Analytics.'
+    ],
+    isMajor: true
+  },
+  {
+    version: 'v2.0.0',
+    date: '07 Feb 2026',
+    status: 'Legacy',
     title: 'The Community Hub Release',
     description: 'Transformasi masif infrastruktur visual dan fungsional menjadi standar industri modern.',
     changes: [
@@ -76,11 +91,11 @@ onMounted(() => {
           <div :style="{ backgroundColor: primaryColor }" class="w-12 h-1.5 rounded-full shadow-2xl"></div>
           <span class="text-[10px] font-black uppercase tracking-[0.6em] text-white/30">System Evolution</span>
         </div>
-        <h1 class="text-7xl md:text-9xl font-black tracking-tighter uppercase leading-[0.8] italic text-white">
+        <h1 class="text-7xl md:text-7xl font-black tracking-tighter uppercase leading-[0.8] text-white">
           Version<br/><span :style="{ color: primaryColor }">History.</span>
         </h1>
-        <p class="mt-12 text-text-muted font-medium text-lg md:text-xl opacity-50 max-w-2xl leading-relaxed italic">
-          Dokumentasi teknis perkembangan platform WibuPedia dari inisialisasi hingga <span class="text-white font-black">Major Release v2.0.0</span>.
+        <p class="mt-12 text-text-muted font-medium text-lg md:text-xl opacity-50 max-w-2xl leading-relaxed ">
+          Dokumentasi teknis perkembangan platform WibuPedia dari inisialisasi hingga <span class="text-white font-black">Refactor Release v2.0.5</span>.
         </p>
       </header>
 
@@ -96,7 +111,7 @@ onMounted(() => {
                  :style="update.status === 'Latest' ? { backgroundColor: primaryColor, boxShadow: `0 0 30px ${primaryColor}`, transform: 'scale(1.8)' } : { backgroundColor: 'rgba(255,255,255,0.1)' }"></div>
 
             <div class="flex flex-col md:flex-row md:items-center gap-6 mb-12">
-              <span class="text-5xl font-black tracking-tighter italic tabular-nums leading-none text-white transition-transform group-hover/section:-translate-x-2">
+              <span class="text-5xl font-black tracking-tighter tabular-nums leading-none text-white transition-transform group-hover/section:-translate-x-2">
                 {{ update.version }}
               </span>
               <div class="flex flex-wrap gap-3">
@@ -115,7 +130,7 @@ onMounted(() => {
               <div class="absolute -right-20 -top-20 w-80 h-80 opacity-[0.02] blur-[100px] rounded-full transition-all group-hover/section:opacity-[0.05]" :style="{ backgroundColor: primaryColor }"></div>
 
               <div class="flex items-center gap-6 mb-10 relative z-10">
-                <h2 class="text-3xl font-black uppercase tracking-tighter italic text-white group-hover/section:text-brand-primary transition-colors">
+                <h2 class="text-3xl font-black uppercase tracking-tighter text-white group-hover/section:text-brand-primary transition-colors">
                   {{ update.title }}
                 </h2>
                 <div v-if="update.isMajor" class="w-10 h-[1px] bg-white/10"></div>
@@ -141,7 +156,7 @@ onMounted(() => {
         <button @click="$router.push('/')" class="group relative px-20 py-7 bg-white text-black rounded-[2.5rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-2xl hover:scale-105 active:scale-95 transition-all">
           <span class="relative z-10 flex items-center justify-center gap-6">
             <i class="fa-solid fa-chevron-left text-[10px] group-hover:-translate-x-2 transition-transform"></i> 
-            Return Hub
+            Return to Home
           </span>
         </button>
       </footer>
@@ -153,7 +168,6 @@ onMounted(() => {
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
 
-/* 🚀 ANIMATION ENGINE */
 .animate-reveal { animation: revealUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 .animate-reveal-item { opacity: 0; animation: revealUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 

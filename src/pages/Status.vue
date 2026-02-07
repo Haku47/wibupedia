@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, version } from 'vue'
 import axios from 'axios'
 import { useLibraryStore } from '@/store/libraryStore'
 import { useUserStore } from '@/store/userStore'
+import { APP_CONFIG } from '@/core/constants/APP_CONFIG'
 
 const libraryStore = useLibraryStore()
 const userStore = useUserStore()
@@ -13,6 +14,7 @@ const lastChecked = ref(null)
 const uptime = ref('99.9%')
 const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
 const activePillars = ref(['Anime Directory', 'Manga Library', 'Novel Archive'])
+const currentVersion = computed(() => APP_CONFIG.VERSION || 'v2.0.0')
 
 // --- 📊 COLLECTION HEALTH ANALYTICS ---
 const storageHealth = computed(() => {
@@ -63,7 +65,7 @@ onMounted(() => {
           <span class="text-[10px] font-black uppercase tracking-widest text-white/40">Network Monitoring</span>
         </div>
         
-        <h1 class="text-6xl md:text-9xl font-black tracking-tighter uppercase italic leading-none text-white">
+        <h1 class="text-6xl md:text-7xl font-black tracking-tighter uppercase  leading-none text-white">
           Service<br/><span :style="{ color: primaryColor }">Status.</span>
         </h1>
         <p class="text-text-muted mt-10 font-bold opacity-40 max-w-2xl mx-auto text-xs md:text-sm tracking-[0.3em] uppercase">
@@ -82,7 +84,7 @@ onMounted(() => {
                 <p class="text-[11px] font-black text-text-muted uppercase tracking-widest opacity-30">Main Database Cluster</p>
                 <span class="px-4 py-1.5 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white/60 tracking-widest uppercase">Jikan API v4</span>
               </div>
-              <h3 class="text-5xl font-black uppercase italic tracking-tighter mb-12 text-white">
+              <h3 class="text-5xl font-black uppercase  tracking-tighter mb-12 text-white">
                 {{ apiStatus === 'checking' ? 'Connecting...' : (apiStatus === 'online' ? 'Operational' : (apiStatus === 'slow' ? 'Limited' : 'Offline')) }}
               </h3>
             </div>
@@ -90,17 +92,17 @@ onMounted(() => {
             <div class="grid grid-cols-2 md:grid-cols-3 gap-10">
               <div class="space-y-2">
                 <p class="text-[9px] font-black text-text-muted uppercase tracking-widest opacity-30">Response Time</p>
-                <p class="text-4xl font-black tabular-nums italic" :style="{ color: apiStatus === 'online' ? 'white' : primaryColor }">
+                <p class="text-4xl font-black tabular-nums " :style="{ color: apiStatus === 'online' ? 'white' : primaryColor }">
                   {{ latency }}<span class="text-xs ml-1 opacity-30">ms</span>
                 </p>
               </div>
               <div class="space-y-2">
                 <p class="text-[9px] font-black text-text-muted uppercase tracking-widest opacity-30">Global Uptime</p>
-                <p class="text-4xl font-black tabular-nums italic text-white">{{ uptime }}</p>
+                <p class="text-4xl font-black tabular-nums  text-white">{{ uptime }}</p>
               </div>
               <div class="space-y-2 hidden md:block">
                 <p class="text-[9px] font-black text-text-muted uppercase tracking-widest opacity-30">Encryption</p>
-                <p class="text-4xl font-black italic text-emerald-500 uppercase tracking-tighter">Standard</p>
+                <p class="text-4xl font-black  text-emerald-500 uppercase tracking-tighter">Standard</p>
               </div>
             </div>
           </div>
@@ -129,7 +131,7 @@ onMounted(() => {
               </svg>
               <i class="fa-solid fa-box-archive absolute text-3xl opacity-10" :style="{ color: primaryColor }"></i>
             </div>
-            <h4 class="text-3xl font-black uppercase italic tracking-tighter" :class="storageHealth.color">{{ storageHealth.label }}</h4>
+            <h4 class="text-3xl font-black uppercase  tracking-tighter" :class="storageHealth.color">{{ storageHealth.label }}</h4>
             <p class="text-[9px] font-black text-text-muted uppercase tracking-widest mt-3 opacity-40">Local Data State</p>
           </div>
         </div>
@@ -138,11 +140,11 @@ onMounted(() => {
           <div class="flex flex-wrap gap-16 items-center">
             <div class="space-y-2">
               <p class="text-[9px] font-black uppercase text-text-muted tracking-widest opacity-30">Last Update</p>
-              <p class="text-2xl font-black italic text-white tabular-nums tracking-tighter">{{ lastChecked || 'WAITING...' }}</p>
+              <p class="text-2xl font-black  text-white tabular-nums tracking-tighter">{{ lastChecked || 'WAITING...' }}</p>
             </div>
             <div class="space-y-2 border-l border-white/5 pl-12">
-              <p class="text-[9px] font-black uppercase text-text-muted tracking-widest opacity-30">Current Node</p>
-              <p class="text-2xl font-black italic uppercase tracking-tighter" :style="{ color: primaryColor }">Malang Hub</p>
+              <p class="text-[9px] font-black uppercase text-text-muted tracking-widest opacity-30">Current Version</p>
+              <p class="text-2xl font-black  uppercase tracking-tighter" :style="{ color: primaryColor }">{{ currentVersion }}</p>
             </div>
           </div>
           

@@ -40,7 +40,7 @@ const handleSubmit = () => {
         <div :style="{ backgroundColor: primaryColor }" class="w-10 h-1 rounded-full shadow-lg"></div>
         <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Community Support</span>
       </div>
-      <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-8 uppercase italic leading-none">
+      <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-8 uppercase leading-none">
         Get In <span :style="{ color: primaryColor }">Touch.</span>
       </h1>
       <p class="text-text-muted font-medium text-lg max-w-2xl opacity-60 leading-relaxed">
@@ -72,7 +72,7 @@ const handleSubmit = () => {
 
         <div class="p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group" :style="{ backgroundColor: primaryColor }">
           <i class="fa-solid fa-heart absolute -right-6 -bottom-6 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-700"></i>
-          <h3 class="font-black text-2xl mb-4 uppercase italic">Malangan Dev</h3>
+          <h3 class="font-black text-2xl mb-4 uppercase">WibuPedia Team</h3>
           <p class="text-white/80 text-sm font-medium leading-relaxed">
             Berbasis di Malang, Indonesia. Kami berdedikasi membangun ekosistem digital yang modern untuk komunitas anime tanah air.
           </p>

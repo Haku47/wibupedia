@@ -1,14 +1,19 @@
 /**
- * Daftar Genre Anime & Manga Populer
+ * Daftar Genre Anime & Manga Populer (SFW Version)
  * Berdasarkan database MyAnimeList / Jikan API
  */
 
 export const ANIME_GENRES = [
   { id: 1, name: 'Action', slug: 'action' },
   { id: 2, name: 'Adventure', slug: 'adventure' },
+  { id: 5, name: 'Avant Garde', slug: 'avant-garde' },
+  { id: 46, name: 'Award Winning', slug: 'award-winning' },
+  { id: 28, name: 'Boys Love', slug: 'boys-love' },
   { id: 4, name: 'Comedy', slug: 'comedy' },
   { id: 8, name: 'Drama', slug: 'drama' },
   { id: 10, name: 'Fantasy', slug: 'fantasy' },
+  { id: 26, name: 'Girls Love', slug: 'girls-love' },
+  { id: 47, name: 'Gourmet', slug: 'gourmet' },
   { id: 14, name: 'Horror', slug: 'horror' },
   { id: 7, name: 'Mystery', slug: 'mystery' },
   { id: 22, name: 'Romance', slug: 'romance' },
@@ -20,13 +25,55 @@ export const ANIME_GENRES = [
 ];
 
 export const THEMES = [
-  { id: 52, name: 'Isekai', slug: 'isekai' },
-  { id: 19, name: 'Music', slug: 'music' },
-  { id: 23, name: 'School', slug: 'school' },
-  { id: 31, name: 'Super Power', slug: 'super-power' },
+  { id: 50, name: 'Adult Cast', slug: 'adult-cast' },
+  { id: 51, name: 'Anthropomorphic', slug: 'anthropomorphic' },
+  { id: 52, name: 'CGDCT', slug: 'cgdct' },
+  { id: 53, name: 'Childcare', slug: 'childcare' },
+  { id: 54, name: 'Combat Sports', slug: 'combat-sports' },
+  { id: 81, name: 'Crossdressing', slug: 'crossdressing' },
+  { id: 55, name: 'Delinquents', slug: 'delinquents' },
+  { id: 39, name: 'Detective', slug: 'detective' },
+  { id: 56, name: 'Educational', slug: 'educational' },
+  { id: 57, name: 'Gag Humor', slug: 'gag-humor' },
   { id: 11, name: 'Game', slug: 'game' },
+  { id: 58, name: 'Gore', slug: 'gore' },
+  { id: 35, name: 'Harem', slug: 'harem' },
+  { id: 59, name: 'High Stakes Game', slug: 'high-stakes-game' },
   { id: 13, name: 'Historical', slug: 'historical' },
+  { id: 60, name: 'Idols (Female)', slug: 'idols-female' },
+  { id: 61, name: 'Idols (Male)', slug: 'idols-male' },
+  { id: 62, name: 'Isekai', slug: 'isekai' },
+  { id: 63, name: 'Iyashikei', slug: 'iyashikei' },
+  { id: 64, name: 'Love Polygon', slug: 'love-polygon' },
+  { id: 65, name: 'Magical Sex Shift', slug: 'magical-sex-shift' },
+  { id: 66, name: 'Mahou Shoujo', slug: 'mahou-shoujo' },
+  { id: 67, name: 'Martial Arts', slug: 'martial-arts' },
+  { id: 68, name: 'Mecha', slug: 'mecha' },
+  { id: 69, name: 'Medical', slug: 'medical' },
   { id: 38, name: 'Military', slug: 'military' },
+  { id: 19, name: 'Music', slug: 'music' },
+  { id: 70, name: 'Mythology', slug: 'mythology' },
+  { id: 71, name: 'Organized Crime', slug: 'organized-crime' },
+  { id: 72, name: 'Otaku Culture', slug: 'otaku-culture' },
+  { id: 73, name: 'Parody', slug: 'parody' },
+  { id: 74, name: 'Pets', slug: 'pets' },
+  { id: 40, name: 'Psychological', slug: 'psychological' },
+  { id: 75, name: 'Reincarnation', slug: 'reincarnation' },
+  { id: 76, name: 'Reverse Harem', slug: 'reverse-harem' },
+  { id: 77, name: 'Romantic Subtext', slug: 'romantic-subtext' },
+  { id: 21, name: 'Samurai', slug: 'samurai' },
+  { id: 23, name: 'School', slug: 'school' },
+  { id: 78, name: 'Showbiz', slug: 'showbiz' },
+  { id: 29, name: 'Space', slug: 'space' },
+  { id: 15, name: 'Strategy Game', slug: 'strategy-game' },
+  { id: 31, name: 'Super Power', slug: 'super-power' },
+  { id: 79, name: 'Survival', slug: 'survival' },
+  { id: 80, name: 'Team Sports', slug: 'team-sports' },
+  { id: 82, name: 'Time Travel', slug: 'time-travel' },
+  { id: 32, name: 'Vampire', slug: 'vampire' },
+  { id: 83, name: 'Video Game', slug: 'video-game' },
+  { id: 84, name: 'Visual Arts', slug: 'visual-arts' },
+  { id: 85, name: 'Workplace', slug: 'workplace' },
 ];
 
 export const DEMOGRAPHICS = [
@@ -34,6 +81,7 @@ export const DEMOGRAPHICS = [
   { id: 25, name: 'Shoujo', slug: 'shoujo' },
   { id: 42, name: 'Seinen', slug: 'seinen' },
   { id: 43, name: 'Josei', slug: 'josei' },
+  { id: 15, name: 'Kids', slug: 'kids' },
 ];
 
 // Gabungan semua untuk keperluan pencarian global

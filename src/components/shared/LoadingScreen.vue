@@ -52,12 +52,12 @@ defineProps({
 
       <div class="absolute bottom-16 flex flex-col items-center gap-4 animate-fade-in-slow">
         <span class="text-[8px] font-black text-white/10 uppercase tracking-[1em] mb-2">
-          {{ APP_CONFIG.STATUS || 'STABLE' }} ENGINE
+          Powered by WibuPedia Identity Core
         </span>
         <div class="flex items-center gap-6">
           <div class="h-px w-8 bg-white/5"></div>
           <span class="text-[10px] font-bold text-text-muted/30 uppercase tracking-widest">
-            Malangan Community Hub
+            WibuPedia v{{ APP_CONFIG.VERSION }}
           </span>
           <div class="h-px w-8 bg-white/5"></div>
         </div>

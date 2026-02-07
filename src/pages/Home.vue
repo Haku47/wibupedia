@@ -4,25 +4,94 @@ import { useRouter } from 'vue-router'
 import { useJikan } from '@/composables/useJikan'
 import { useLibraryStore } from '@/store/libraryStore'
 import { useUserStore } from '@/store/userStore' 
-// --- 🛡️ IMPORT RESTORED TO CARDS DIRECTORY ---
+
+// --- 💳 ELITE CARDS IMPORT ---
 import AnimeCard from '@/components/cards/AnimeCard.vue'
+import MangaCard from '@/components/cards/MangaCard.vue'
+import MovieCard from '@/components/cards/MovieCard.vue'
+import NovelCard from '@/components/cards/NovelCard.vue'
+import DonghuaCard from '@/components/cards/DonghuaCard.vue'
 import SkeletonCard from '@/components/shared/SkeletonCard.vue'
 
 const router = useRouter()
 const libraryStore = useLibraryStore()
 const userStore = useUserStore() 
-const { items, loading, fetchSeasonal, fetchTrending } = useJikan()
+const { items, loading, fetchTrending, search, clear } = useJikan()
 
 // --- STATES ---
-const activeTab = ref('harian')
+const activeTab = ref('tv') 
+const activeGenre = ref(null)
 const topRankItems = ref([])
 const trendingRef = ref(null)
 
-// --- COMPUTED ---
-const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
-const firstName = computed(() => userStore.profile.name.split(' ')[0])
+// --- 🏷️ POPULAR GENRES LIST (CE STANDARD) ---
+const QUICK_GENRES = [
+  { id: 1, name: 'Action' }, { id: 2, name: 'Adventure' }, { id: 4, name: 'Comedy' },
+  { id: 8, name: 'Drama' }, { id: 10, name: 'Fantasy' }, { id: 22, name: 'Romance' },
+  { id: 37, name: 'Supernatural' }, { id: 62, name: 'Isekai' }
+]
 
-// --- LOGIC: SCROLL ENGINE ---
+// --- 🍞 TOAST SYSTEM ---
+const toast = ref({ show: false, message: '', type: 'add' })
+const triggerToast = (msg, type = 'add') => {
+  toast.value = { show: true, message: msg, type }
+  setTimeout(() => { toast.value.show = false }, 3000)
+}
+
+// --- COMMUNITY THEME ENGINE ---
+const theme = computed(() => {
+  const configs = {
+    tv: { label: 'TV Series', color: 'text-brand-primary', bg: 'bg-brand-primary', hex: '#3b82f6' },
+    movie: { label: 'Movies', color: 'text-purple-500', bg: 'bg-purple-500', hex: '#a855f7' },
+    manga: { label: 'Manga', color: 'text-emerald-500', bg: 'bg-emerald-500', hex: '#10b981' },
+    novel: { label: 'Light Novel', color: 'text-amber-500', bg: 'bg-amber-500', hex: '#f59e0b' },
+    donghua: { label: 'Donghua', color: 'text-red-500', bg: 'bg-red-500', hex: '#ef4444' }
+  }
+  return configs[activeTab.value] || configs.tv
+})
+
+const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
+const firstName = computed(() => userStore.profile.name?.split(' ')[0] || 'User')
+
+// --- LOGIC: QUICK BOOKMARK ---
+const handleQuickBookmark = (e, item) => {
+  e.stopPropagation()
+  if (libraryStore.isInLibrary(item.mal_id)) {
+    libraryStore.removeFromLibrary(item.mal_id)
+    triggerToast('Removed from Collection', 'remove')
+  } else {
+    libraryStore.addToLibrary({ ...item, category: 'anime', addedAt: new Date().toISOString() })
+    triggerToast('Added to Collection', 'add')
+  }
+}
+
+// --- LOGIC: DATA FETCHING ---
+const loadMainContent = async (type, genreId = null) => {
+  activeTab.value = type
+  activeGenre.value = genreId
+  clear() 
+  
+  const filterParams = genreId ? { genres: genreId.toString() } : {}
+
+  if (type === 'tv') {
+    if (genreId) await search('', 'anime', { ...filterParams, type: 'tv', order_by: 'score' })
+    else await fetchTrending('anime', 1, 'airing')
+  } 
+  else if (type === 'movie') {
+    await search('', 'anime', { ...filterParams, type: 'movie', order_by: 'score', sort: 'desc' })
+  } 
+  else if (type === 'manga') {
+    if (genreId) await search('', 'manga', { ...filterParams, type: 'manga', order_by: 'score' })
+    else await fetchTrending('manga', 1, 'bypopularity')
+  } 
+  else if (type === 'novel') {
+    await search('', 'manga', { ...filterParams, type: 'lightnovel', order_by: 'popularity', sort: 'desc' })
+  } 
+  else if (type === 'donghua') {
+    await search('', 'anime', { ...filterParams, type: 'ona', order_by: 'popularity', sort: 'desc' })
+  }
+}
+
 const scrollTrending = (direction) => {
   if (trendingRef.value) {
     const scrollAmount = direction === 'left' ? -400 : 400
@@ -30,116 +99,139 @@ const scrollTrending = (direction) => {
   }
 }
 
-const loadCategory = async (type) => {
-  activeTab.value = type
-  if (type === 'harian') await fetchTrending('anime', 1, 'airing')
-  else if (type === 'mingguan') await fetchTrending('anime', 1, 'bypopularity')
-  else await fetchSeasonal(1)
-}
-
 onMounted(async () => {
-  await loadCategory('harian')
-  const { items: trending, fetchTrending: fetchGlobal } = useJikan()
-  await fetchGlobal('anime', 1, 'favorite')
-  topRankItems.value = trending.value.slice(0, 10)
+  await loadMainContent('tv')
+  const { fetchTrending: fetchGlobal } = useJikan()
+  const res = await fetchGlobal('anime', 1, 'favorite')
+  topRankItems.value = res?.slice(0, 10) || []
 })
 </script>
 
 <template>
-  <main class="min-h-screen pb-40 bg-dark-bg font-outfit selection:bg-white/10 relative">
+  <main class="min-h-screen pb-40 bg-dark-bg font-outfit selection:bg-white/10 relative overflow-x-hidden">
     
-    <div :style="{ backgroundColor: primaryColor }" class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] opacity-[0.03] blur-[120px] pointer-events-none"></div>
+    <Transition name="toast-slide">
+      <div v-if="toast.show" 
+           class="fixed top-12 left-1/2 -translate-x-1/2 z-[1000] px-8 py-4 rounded-2xl backdrop-blur-2xl border border-white/10 shadow-2xl flex items-center gap-4 min-w-[320px]"
+           :class="toast.type === 'add' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'">
+        <div class="w-2 h-2 rounded-full animate-pulse" :class="toast.type === 'add' ? 'bg-emerald-400' : 'bg-red-400'"></div>
+        <span class="text-[11px] font-black uppercase tracking-[0.2em] italic">{{ toast.message }}</span>
+      </div>
+    </Transition>
 
-    <nav class="max-w-7xl mx-auto px-8 pt-16 pb-12 flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/[0.03]">
-      <div class="space-y-1">
-        <h1 class="text-3xl font-black text-white tracking-tighter uppercase italic">
+    <div :style="{ backgroundColor: primaryColor }" class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] opacity-[0.03] blur-[120px] pointer-events-none"></div>
+
+    <nav class="max-w-7xl mx-auto px-8 pt-16 pb-12 flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/[0.03] relative z-20">
+      <div class="space-y-2">
+        <h1 class="text-4xl font-black text-white tracking-tighter uppercase leading-none">
           Okaeri, <span :style="{ color: primaryColor }">{{ firstName }}.</span>
         </h1>
-        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.5em]">System Status: Operational</p>
+        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.6em]">WIBUPEDIA SYSTEM</p>
       </div>
 
-      <div class="flex items-center gap-6">
-        <div class="flex flex-col text-right">
-          <span class="text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">Vault Size</span>
-          <span class="text-xl font-black text-white tabular-nums tracking-tighter">{{ libraryStore.totalItems }} <span class="text-[10px] opacity-20">Titles</span></span>
+      <div class="flex items-center gap-6 bg-white/[0.02] border border-white/5 p-4 rounded-[2rem] backdrop-blur-xl">
+        <div class="flex flex-col text-right px-4">
+          <span class="text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">Archived Items</span>
+          <span class="text-xl font-black text-white tabular-nums tracking-tighter">{{ libraryStore.totalItems }} <span class="text-[10px] opacity-20 italic">Units</span></span>
         </div>
         <button @click="router.push('/library')" 
-                class="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all shadow-xl">
-          <i class="fa-solid fa-bookmark text-sm"></i>
+                :style="{ backgroundColor: primaryColor }"
+                class="w-14 h-14 rounded-[1.4rem] flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all shadow-2xl">
+          <i class="fa-solid fa-layer-group text-lg"></i>
         </button>
       </div>
     </nav>
 
     <section class="max-w-7xl mx-auto px-8 pt-16 mb-24 relative group/trending">
-      <div class="flex items-center justify-between mb-10">
+      <div class="flex items-center justify-between mb-12">
         <div class="flex items-center gap-4">
-           <h2 class="text-sm font-black uppercase tracking-[0.4em] text-white italic">Current Trends.</h2>
-           <div class="hidden md:flex items-center gap-2 ml-4">
-              <button @click="scrollTrending('left')" class="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                <i class="fa-solid fa-chevron-left text-[10px]"></i>
-              </button>
-              <button @click="scrollTrending('right')" class="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-              </button>
-           </div>
+           <div class="w-1 h-4 rounded-full bg-white/10"></div>
+           <h2 class="text-sm font-black uppercase tracking-[0.5em] text-white/30 italic">Hall of Fame</h2>
         </div>
-        <RouterLink to="/trending" 
-                    class="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors">
-          See All Rankings
-        </RouterLink>
+        <div class="flex items-center gap-3">
+            <button @click="scrollTrending('left')" class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <button @click="scrollTrending('right')" class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+        </div>
       </div>
 
-      <div ref="trendingRef" class="flex gap-6 overflow-x-auto pb-10 scrollbar-hide snap-x relative z-10">
+      <div ref="trendingRef" class="flex gap-8 overflow-x-auto pb-14 scrollbar-hide snap-x relative z-10">
         <div v-for="(item, idx) in topRankItems" :key="item.mal_id" 
              @click="router.push(`/anime/${item.mal_id}`)"
-             class="flex-shrink-0 w-44 md:w-52 snap-start group cursor-pointer relative">
-          <div class="relative aspect-[3/4.4] rounded-[2.5rem] overflow-hidden border border-white/5 shadow-xl transition-all duration-500 group-hover:-translate-y-3">
-             <img :src="item.images.jpg.large_image_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-             <div class="absolute inset-0 bg-gradient-to-t from-dark-bg/90 via-transparent to-transparent opacity-60"></div>
-             
-             <div class="absolute top-4 left-4 w-8 h-8 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center">
-                <span class="text-[10px] font-black text-white tabular-nums">#{{ idx + 1 }}</span>
-             </div>
-          </div>
-          <div class="mt-5 px-1">
-             <h4 class="text-[12px] font-black text-white uppercase truncate tracking-tight mb-1">{{ item.title }}</h4>
-             <div class="flex items-center gap-2">
-                <span class="text-[8px] font-bold text-white/20 uppercase tracking-widest">{{ item.type }}</span>
-                <div class="w-1 h-1 rounded-full bg-white/10"></div>
-                <span class="text-[9px] font-black text-emerald-400 tabular-nums">★ {{ item.score }}</span>
+             class="flex-shrink-0 w-48 md:w-56 snap-start group cursor-pointer relative">
+          <div class="relative aspect-[3/4.4] rounded-[2.5rem] overflow-hidden border-4 border-white/5 shadow-2xl transition-all duration-700 group-hover:-translate-y-4">
+             <img :src="item.images.jpg.large_image_url" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]" />
+             <div class="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-90"></div>
+             <div class="absolute top-5 left-5 w-10 h-10 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-xs font-black text-white">#{{ idx + 1 }}</div>
+             <button @click="handleQuickBookmark($event, item)" 
+                     class="absolute top-5 right-5 w-12 h-12 rounded-2xl backdrop-blur-2xl border border-white/10 flex items-center justify-center transition-all z-20"
+                     :class="libraryStore.isInLibrary(item.mal_id) ? 'bg-red-500 text-white' : 'bg-white/10 text-white hover:bg-white hover:text-black'">
+                <i :class="libraryStore.isInLibrary(item.mal_id) ? 'fa-solid fa-heart' : 'fa-solid fa-plus'" class="text-sm"></i>
+             </button>
+             <div class="absolute bottom-6 left-6 right-6">
+                <p class="text-[9px] font-black text-brand-primary uppercase tracking-[0.3em] mb-2">{{ item.type }}</p>
+                <h4 class="text-sm font-black text-white uppercase line-clamp-1 italic">{{ item.title }}</h4>
              </div>
           </div>
         </div>
-      </div>
-
-      <div class="absolute bottom-6 left-8 right-8 h-[2px] bg-white/[0.03] rounded-full overflow-hidden pointer-events-none">
-         <div class="h-full bg-white/10 w-1/4 animate-shimmer-bar"></div>
       </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-8">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-10 mb-16">
-        <div class="flex items-center gap-5">
-           <div class="w-1.5 h-8 rounded-full" :style="{ backgroundColor: primaryColor }"></div>
-           <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase italic">Discovery <span class="opacity-20">Catalog.</span></h3>
+    <section class="max-w-7xl mx-auto px-8 relative z-10">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-12">
+        <div class="space-y-4">
+           <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
+             Discovery <span class="opacity-20 italic">Archive.</span>
+           </h3>
+           <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.5em] flex items-center gap-3">
+             <span class="w-6 h-0.5" :class="theme.bg"></span> Now Viewing: {{ theme.label }} {{ activeGenre ? `• ${QUICK_GENRES.find(g => g.id === activeGenre).name}` : '' }}
+           </p>
         </div>
 
-        <div class="flex p-1.5 bg-white/[0.02] border border-white/5 rounded-2xl backdrop-blur-xl">
-           <button v-for="tab in ['harian', 'mingguan', 'bulanan']" :key="tab"
-             @click="loadCategory(tab)" 
-             :class="activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/30 hover:text-white'" 
-             class="px-10 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">
-             {{ tab }}
+        <div class="flex p-2 bg-dark-surface border border-white/5 rounded-[2.5rem] shadow-2xl backdrop-blur-2xl overflow-x-auto scrollbar-hide">
+           <button v-for="type in ['tv', 'movie', 'manga', 'novel', 'donghua']" :key="type"
+             @click="loadMainContent(type)" 
+             :class="activeTab === type ? [theme.bg, 'text-white shadow-xl scale-105'] : 'text-text-muted hover:text-white'" 
+             class="px-10 md:px-12 py-4 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all italic whitespace-nowrap">
+             {{ type }}
            </button>
         </div>
       </div>
 
-      <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+      <div class="flex items-center gap-3 overflow-x-auto scrollbar-hide pb-12 px-2">
+        <button @click="loadMainContent(activeTab, null)"
+                :class="!activeGenre ? [theme.bg, 'text-white'] : 'bg-white/5 text-white/30'"
+                class="px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border border-white/5 whitespace-nowrap">
+          All Genres
+        </button>
+        <button v-for="genre in QUICK_GENRES" :key="genre.id"
+                @click="loadMainContent(activeTab, genre.id)"
+                :class="activeGenre === genre.id ? [theme.bg, 'text-white shadow-lg'] : 'bg-white/5 text-white/30 hover:text-white hover:bg-white/10'"
+                class="px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border border-white/5 whitespace-nowrap">
+          {{ genre.name }}
+        </button>
+      </div>
+
+      <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-10">
         <SkeletonCard v-for="n in 12" :key="n" />
       </div>
 
-      <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-        <AnimeCard v-for="anime in items" :key="anime.mal_id" :anime="anime" />
+      <div v-else-if="items.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-10 animate-fade-in">
+        <template v-for="item in items" :key="item.mal_id">
+          <AnimeCard v-if="activeTab === 'tv'" :anime="item" @action="(p) => triggerToast(p.message, p.type)" />
+          <MovieCard v-else-if="activeTab === 'movie'" :movie="item" @action="(p) => triggerToast(p.message, p.type)" />
+          <MangaCard v-else-if="activeTab === 'manga'" :manga="item" @action="(p) => triggerToast(p.message, p.type)" />
+          <NovelCard v-else-if="activeTab === 'novel'" :novel="item" @action="(p) => triggerToast(p.message, p.type)" />
+          <DonghuaCard v-else-if="activeTab === 'donghua'" :donghua="item" @action="(p) => triggerToast(p.message, p.type)" />
+        </template>
+      </div>
+
+      <div v-else class="py-32 flex flex-col items-center justify-center text-center">
+        <i class="fa-solid fa-box-open text-5xl text-white/5 mb-6"></i>
+        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">No Records in this Genre</p>
       </div>
     </section>
 
@@ -149,12 +241,10 @@ onMounted(async () => {
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
-
-@keyframes shimmer-bar {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(400%); }
-}
-.animate-shimmer-bar {
-  animation: shimmer-bar 3s infinite linear;
-}
+.animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.toast-slide-enter-active, .toast-slide-leave-active { transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.toast-slide-enter-from { opacity: 0; transform: translate(-50%, -60px); }
+.toast-slide-leave-to { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 </style>
