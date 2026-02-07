@@ -10,7 +10,6 @@ import MangaCard from '@/components/cards/MangaCard.vue'
 import MovieCard from '@/components/cards/MovieCard.vue'
 import NovelCard from '@/components/cards/NovelCard.vue'
 import DonghuaCard from '@/components/cards/DonghuaCard.vue'
-
 import EmptyState from '@/components/shared/EmptyState.vue'
 
 const router = useRouter()
@@ -19,9 +18,21 @@ const userStore = useUserStore()
 
 // --- STATES ---
 const activeTab = ref('tv') 
-const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
+const toast = ref({ show: false, message: '' })
 
-// --- COLLECTION FILTER LOGIC (SYNCED WITH CE) ---
+// --- THEME ENGINE ---
+const theme = computed(() => {
+  const configs = {
+    tv: { color: 'text-brand-primary', bg: 'bg-brand-primary', hex: '#3b82f6' },
+    movie: { color: 'text-purple-500', bg: 'bg-purple-500', hex: '#a855f7' },
+    manga: { color: 'text-emerald-500', bg: 'bg-emerald-500', hex: '#10b981' },
+    novel: { color: 'text-amber-500', bg: 'bg-amber-500', hex: '#f59e0b' },
+    donghua: { color: 'text-red-500', bg: 'bg-red-500', hex: '#ef4444' }
+  }
+  return configs[activeTab.value] || configs.tv
+})
+
+// --- COLLECTION FILTER LOGIC ---
 const filteredItems = computed(() => {
   return libraryStore.sortedLibrary.filter(item => {
     const type = item.type?.toUpperCase() || ''
@@ -34,7 +45,6 @@ const filteredItems = computed(() => {
   })
 })
 
-// --- COLLECTION COUNTERS ---
 const stats = computed(() => {
   const lib = libraryStore.myLibrary
   return {
@@ -46,21 +56,22 @@ const stats = computed(() => {
   }
 })
 
-const theme = computed(() => {
-  const configs = {
-    tv: { color: 'text-brand-primary', bg: 'bg-brand-primary' },
-    movie: { color: 'text-purple-500', bg: 'bg-purple-500' },
-    manga: { color: 'text-emerald-500', bg: 'bg-emerald-500' },
-    novel: { color: 'text-amber-500', bg: 'bg-amber-500' },
-    donghua: { color: 'text-red-500', bg: 'bg-red-500' }
-  }
-  return configs[activeTab.value] || configs.tv
-})
+// --- ELITE HANDLERS ---
+const triggerToast = (msg) => {
+  toast.value = { show: true, message: msg }
+  setTimeout(() => { toast.value.show = false }, 3000)
+}
 
-// --- REMOVE HANDLER ---
 const handleRemove = (id) => {
-  if (confirm('Hapus item ini dari archive?')) {
-    libraryStore.removeFromLibrary(id)
+  // Bye bye alert() kuno!
+  libraryStore.removeFromLibrary(id)
+  triggerToast('Removed from Collection')
+}
+
+const handleClearVault = () => {
+  if (confirm('Critical Action: Reset entire collection?')) {
+    libraryStore.clearLibrary()
+    triggerToast('Collection has reset successfully')
   }
 }
 </script>
@@ -72,19 +83,19 @@ const handleRemove = (id) => {
     <header class="pt-12 md:pt-20 mb-12 px-6 max-w-7xl mx-auto relative z-10">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
         
-      <div class="space-y-6">
-        <div class="flex items-center gap-3">
-          <span 
-            :class="[theme.color]" 
-            class="px-4 py-1.5 bg-white/[0.03] text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-current shadow-sm transition-colors duration-500"
-            :style="{ borderColor: `${theme.hex}40` }"
-          >
-            <i class="fa-solid fa-shield-halved mr-2 opacity-50"></i>
-            Collection Archive
-          </span>
-        </div>
+        <div class="space-y-6">
+          <div class="flex items-center gap-3">
+            <span 
+              :class="[theme.color]" 
+              class="px-4 py-1.5 bg-white/[0.03] text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-current shadow-sm transition-colors duration-500"
+              :style="{ borderColor: `${theme.hex}40` }"
+            >
+              <i class="fa-solid fa-shield-halved mr-2 opacity-50"></i>
+              Collection Archive
+            </span>
+          </div>
           
-          <h1 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase  leading-none">
+          <h1 class="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-none">
             My <span :class="theme.color" class="transition-colors duration-700">Archive</span>
           </h1>
 
@@ -108,7 +119,7 @@ const handleRemove = (id) => {
             <button @click="router.push('/report')" class="p-3 rounded-xl bg-white/5 hover:bg-white hover:text-black transition-all group/btn">
               <i class="fa-solid fa-chart-pie text-sm"></i>
             </button>
-            <button @click="libraryStore.clearLibrary" class="p-3 rounded-xl bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+            <button @click="handleClearVault" class="p-3 rounded-xl bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all">
               <i class="fa-solid fa-trash-can text-sm"></i>
             </button>
           </div>
@@ -117,7 +128,6 @@ const handleRemove = (id) => {
     </header>
 
     <div class="px-6 max-w-7xl mx-auto relative z-10">
-      
       <EmptyState v-if="filteredItems.length === 0"
         :icon="activeTab === 'tv' ? 'fa-solid fa-box-open' : 'fa-solid fa-ghost'"
         :title="`Archive is Empty`"
@@ -156,6 +166,15 @@ const handleRemove = (id) => {
         </TransitionGroup>
       </div>
     </div>
+
+    <Transition name="toast">
+      <div v-if="toast.show" 
+           class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[500] px-10 py-5 rounded-[2rem] bg-red-500/20 text-red-400 border border-red-500/20 backdrop-blur-2xl shadow-2xl flex items-center gap-4 min-w-[280px]">
+        <div class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] italic">{{ toast.message }}</span>
+      </div>
+    </Transition>
+
   </main>
 </template>
 
@@ -163,22 +182,17 @@ const handleRemove = (id) => {
 .font-outfit { font-family: 'Outfit', sans-serif; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* 🚀 VAULT STAGGER TRANSITIONS */
+/* 🚀 VAULT TRANSITIONS */
 .vault-list-move, 
 .vault-list-enter-active, 
-.vault-list-leave-active {
-  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
+.vault-list-leave-active { transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .vault-list-enter-from, 
-.vault-list-leave-to {
-  opacity: 0;
-  transform: scale(0.9) translateY(30px);
-  filter: blur(15px);
-}
-.vault-list-leave-active {
-  position: absolute;
-  width: calc(16.66% - 2rem); /* Dynamic grid spacing sync */
-}
+.vault-list-leave-to { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); }
+.vault-list-leave-active { position: absolute; width: calc(16.66% - 2rem); }
+
+/* 🍞 TOAST TRANSITIONS */
+.toast-enter-active, .toast-leave-active { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translate(-50%, 40px) scale(0.9); }
 
 @media (max-width: 1280px) { .vault-list-leave-active { width: calc(20% - 2rem); } }
 @media (max-width: 1024px) { .vault-list-leave-active { width: calc(25% - 2rem); } }
