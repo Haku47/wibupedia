@@ -1,69 +1,72 @@
-# 🌌 WibuPedia Intelligence Vault — v1.9.9
+# 🌌 WibuPedia Community Hub — v2.0.0
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Version-1.9.9-blue?style=for-the-badge&logo=target" alt="Version">
-  <img src="https://img.shields.io/badge/Status-Operational-emerald?style=for-the-badge" alt="Status">
+  <img src="https://img.shields.io/badge/Version-2.0.0-10b981?style=for-the-badge&logo=target" alt="Version">
+  <img src="https://img.shields.io/badge/Status-Stable-emerald?style=for-the-badge" alt="Status">
   <img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/Build-Production-3b82f6?style=for-the-badge" alt="Build">
 </p>
 
-> **Project Code:** MALANG-RESEARCH-CENTER-V1  
-> **Base Ops:** Malang, East Java, Indonesia  
-> **Intelligence Suite:** Final v1.x Deployed
+> **Project Base:** Malang, East Java, Indonesia  
+> **Development Hub:** WibuPedia Research Center  
+> **Release Class:** Major Stable Release (v2.x)
 
-WibuPedia adalah **Personal Anime & Manga Intelligence Vault** yang dirancang untuk Host yang menginginkan kontrol penuh atas arsip hobi mereka. Dibangun dengan arsitektur modern, aplikasi ini mengutamakan **Kedaulatan Data (Local-First)**, estetika *Tactical UI*, dan performa yang sangat dioptimasi.
-
----
-
-## 🛠️ Tech Stack & Infrastructure
-
-Proyek ini dibangun menggunakan teknologi mutakhir untuk menjamin stabilitas dan kecepatan akses data:
-
-### Core Framework & State
-* ![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D) **Vue 3 (Composition API):** Reactive UI engine.
-* ![Pinia](https://img.shields.io/badge/pinia-%23aeaaaf.svg?style=for-the-badge&logo=pinia&logoColor=white) **Pinia:** Global state management untuk sinkronisasi Library & Persona.
-* ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) **Vite:** Next-generation frontend tooling untuk HMR super cepat.
-
-### Styling & UI
-* ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white) **Tailwind CSS:** Utility-first CSS untuk kustomisasi tema *Dark Tactical*.
-* ![FontAwesome](https://img.shields.io/badge/Font_Awesome-528DD7?style=for-the-badge&logo=font-awesome&logoColor=white) **Font Awesome 6:** Protokol ikonografi sistem.
-* **Google Fonts (Outfit):** Tipografi utama untuk kesan futuristik.
-
-### Data & Performance
-* ![LocalStorage](https://img.shields.io/badge/Local_Storage-F1502F?style=for-the-badge&logo=git&logoColor=white) **Browser Storage:** Penyimpanan data offline-first (Zero Server Dependency).
-* **Jikan API V4:** Gateway utama menuju database MyAnimeList.
-* **Ghost Frame Protocol:** Optimasi internal untuk LCP (Largest Contentful Paint) < 2.5s.
+WibuPedia adalah **Personal Anime & Manga Archive** kelas premium yang dirancang untuk kolektor yang mengapresiasi estetika dan fungsionalitas. Menjunjung tinggi **Community Standard**, aplikasi ini menghadirkan pengalaman visual *High-Fidelity* dengan sistem manajemen koleksi yang cerdas, cepat, dan sepenuhnya berada dalam kendali pengguna (**Local-First Data**).
 
 ---
 
-## 🛡️ Core Intelligence Pillars (v1.x)
+## ✨ High-Fidelity Features (v2.0.0)
 
-* **🧠 Neural Link Intelligence:** Algoritma rekomendasi reaktif berbasis pemetaan DNA genre koleksi Host.
-* **👁️ Oracle Eye Search:** Mesin pencarian instan dengan akses database 1.4M+ entri.
-* **📊 Persona Dossier:** Modul analisis psikografis yang merangkum jati diri "Wibu" Host (`/report`).
-* **📦 Data Sovereignty:** Protokol *Black Box* logging dan sistem *Export/Import* JSON mandiri.
-
----
-
-## 🛤️ Roadmap: The Social Matrix (v2.x)
-
-- [ ] **v2.0.0: The Sharing Protocol** - Quick share profile cards (Canvas API).
-- [ ] **v2.2.0: Comparison Engine** - Menghitung Affinity Level antar pengguna.
-- [ ] **v2.5.0: The Watchlist Oracle** - Prediksi penyelesaian serial berbasis *Local AI Logic*.
-- [ ] **v3.0.0: Cloud Leap** - Sinkronisasi lintas perangkat via Firebase/Supabase.
+* **🎭 Cinematic Stage:** Hero Carousel HD dengan *Ken Burns Effect* yang mengambil galeri visual resmi langsung dari sumber data.
+* **🏗️ Bento Grid Architecture:** Layout detail informasi yang presisi, terorganisir, dan seimbang untuk kenyamanan membaca maksimal.
+* **📊 Community Taste Report:** Mesin analitik personal yang memetakan jati diri Anda berdasarkan DNA genre koleksi yang Anda miliki.
+* **🔍 Archive Explorer:** Akses instan ke jutaan entri database melalui integrasi Jikan API v4 yang dioptimasi.
+* **🎨 Signature Style:** Antarmuka *Premium Dark Mode* dengan aksen warna dinamis yang dapat disesuaikan sepenuhnya.
 
 ---
 
-## 🚀 Installation
+## 🛠️ Tech Stack & Architecture
+
+Dibangun dengan standar pengembangan modern untuk memastikan performa tanpa kompromi:
+
+### Core Framework
+* ![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D) **Vue 3 (Composition API):** Reactive UI engine dengan performa tinggi.
+* ![Pinia](https://img.shields.io/badge/pinia-%23aeaaaf.svg?style=for-the-badge&logo=pinia&logoColor=white) **Pinia:** State management terpusat untuk sinkronisasi library dan preferensi user.
+* ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) **Vite:** Build tool generasi baru untuk pengembangan super cepat.
+
+### Styling & Visual
+* ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white) **Tailwind CSS:** Sistem styling modern untuk membangun layout *Zen Space*.
+* ![FontAwesome](https://img.shields.io/badge/Font_Awesome-528DD7?style=for-the-badge&logo=font-awesome&logoColor=white) **Font Awesome 6:** Protokol ikonografi standar industri.
+* **Typography:** Menggunakan *Outfit font family* untuk kesan futuristik dan bersih.
+
+### Data Infrastructure
+* ![LocalStorage](https://img.shields.io/badge/Local_Storage-F1502F?style=for-the-badge&logo=git&logoColor=white) **Privacy First:** Data koleksi disimpan secara lokal di browser Anda (Zero-Server Dependency).
+* **Jikan API V4:** Gateway sinkronisasi data global menuju database MyAnimeList.
+
+---
+
+## 🛤️ Roadmap: Future Evolution
+
+- [x] **v2.0.0: The Community Hub** - Major UI Redesign, HD Gallery, and Bento Layouts.
+- [ ] **v2.2.0: Social Identity** - Fitur profil card yang dapat diunduh (Canvas API).
+- [ ] **v2.5.0: Advanced Recommendation** - Algoritma saran anime berbasis perilaku browsing lokal.
+- [ ] **v3.0.0: Cloud Bridge** - Sinkronisasi lintas perangkat opsional menggunakan Supabase.
+
+---
+
+## 🚀 Get Started
+
+Siapkan *Command Center* Anda dan jalankan aplikasi dalam hitungan detik:
 
 ```bash
 # Clone repository
 git clone [https://github.com/Haku47/wibupedia.git](https://github.com/Haku47/wibupedia.git)
 
-# Enter directory
+# Masuk ke direktori projek
 cd wibupedia
 
-# Install dependencies
+# Install seluruh dependensi
 npm install
 
-# Run Tactical Command Center
+# Jalankan server pengembangan
 npm run dev
