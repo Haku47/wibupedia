@@ -17,6 +17,12 @@ const routes = [
     meta: { title: 'WibuPedia - Katalog Anime, Manga & Novel' }
   },
   {
+    path: '/auth',
+    name: 'auth',
+    component: () => import('@/pages/Auth.vue'),
+    meta: { title: 'Autentikasi Pengguna - WibuPedia' }
+  },
+  {
     path: '/settings',
     name: 'settings',
     component: () => import('@/pages/User/Settings.vue'),
@@ -44,6 +50,12 @@ const routes = [
         next({ name: 'not-found' })
       }
     }
+  },
+  {
+    path: '/trending',
+    nama: 'trending',
+    component: () => import('@/pages/Trending.vue'),
+    meta: { title: 'Trending - Wibupedia'}
   },
   {
     path: '/library',

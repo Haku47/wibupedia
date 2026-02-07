@@ -1,21 +1,22 @@
 <script setup>
-import { ref, onErrorCaptured } from 'vue'
+import { ref, onErrorCaptured, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store/userStore.js'
 
 const error = ref(null)
 const router = useRouter()
+const userStore = useUserStore()
+const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
 
-// Menangkap error dari komponen anak (children)
+// Menangkap error dari komponen anak
 onErrorCaptured((err) => {
   error.value = err
-  console.error('Vault Security Triggered - Error Captured:', err)
-  // return false agar error tidak terus naik ke konsol browser
+  console.error('Community Hub Alert - Error Captured:', err)
   return false
 })
 
 const resetError = () => {
   error.value = null
-  // Me-reload halaman secara halus untuk membersihkan memory state
   window.location.reload()
 }
 
@@ -24,43 +25,43 @@ const returnHome = () => {
   router.push('/')
 }
 
-// Vite Environment Detection (Original logic preserved)
+// Vite Environment Detection
 const isDev = import.meta.env.DEV
 </script>
 
 <template>
-  <div v-if="error" class="min-h-[500px] flex items-center justify-center p-6 bg-dark-bg relative overflow-hidden">
-    <div class="absolute w-[400px] h-[400px] bg-red-500/5 blur-[100px] rounded-full pointer-events-none"></div>
+  <div v-if="error" class="min-h-[600px] flex items-center justify-center p-6 bg-dark-bg relative overflow-hidden font-outfit">
+    <div class="absolute w-[500px] h-[500px] bg-red-500/10 blur-[150px] rounded-full pointer-events-none transition-all duration-1000"></div>
 
-    <div class="max-w-md w-full bg-dark-surface border border-red-500/20 rounded-[3rem] p-10 text-center backdrop-blur-xl shadow-2xl relative z-10 animate-reveal">
+    <div class="max-w-md w-full bg-dark-surface border border-white/5 rounded-[3.5rem] p-12 text-center backdrop-blur-3xl shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] relative z-10 animate-reveal">
       
-      <div class="relative w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-10">
-        <div class="absolute inset-0 bg-red-500/20 rounded-full animate-ping opacity-40"></div>
-        <i class="fa-solid fa-triangle-exclamation text-3xl text-red-500 relative z-10"></i>
+      <div class="relative w-24 h-24 bg-red-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 group">
+        <div class="absolute inset-0 bg-red-500/20 rounded-[2.5rem] animate-ping opacity-30"></div>
+        <i class="fa-solid fa-circle-exclamation text-4xl text-red-500 relative z-10 transition-transform group-hover:scale-110"></i>
       </div>
 
-      <h2 class="text-3xl font-black text-text-main mb-4 font-outfit uppercase tracking-tighter italic">System Halted.</h2>
-      <p class="text-text-muted mb-10 leading-relaxed font-medium opacity-60 text-sm">
-        Terjadi kegagalan pada enkripsi data atau render komponen. Vault terpaksa dikunci untuk menjaga integritas sistem.
+      <h2 class="text-4xl font-black text-white mb-6 uppercase tracking-tighter italic">Oops!</h2>
+      <p class="text-text-muted mb-12 leading-relaxed font-medium opacity-60 text-base">
+        Terjadi kendala saat memuat halaman ini. Jangan khawatir, silakan coba segarkan halaman atau kembali ke beranda.
       </p>
 
       <div class="flex flex-col gap-4">
-        <button @click="resetError" class="w-full py-5 bg-red-600 hover:bg-red-500 text-white font-black rounded-2xl uppercase tracking-[0.2em] text-[10px] shadow-2xl shadow-red-600/20 active:scale-95 transition-all">
-          Re-Initialize System
+        <button @click="resetError" class="w-full py-6 bg-red-600 hover:bg-red-500 text-white font-black rounded-3xl uppercase tracking-[0.3em] text-[11px] shadow-2xl shadow-red-600/30 active:scale-95 transition-all">
+          Refresh Page
         </button>
         
-        <button @click="returnHome" class="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:text-brand-primary transition-colors py-2">
-          Return to Dashboard
+        <button @click="returnHome" class="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-white transition-all py-4">
+          Return to Home
         </button>
       </div>
 
-      <div v-if="isDev" class="mt-10 p-6 bg-black/40 rounded-[2rem] text-left border border-white/5 relative overflow-hidden group">
-        <div class="flex items-center justify-between mb-4">
-           <p class="text-[9px] font-black uppercase text-red-400 tracking-widest opacity-50">Stack Trace Discovery</p>
-           <span class="px-2 py-0.5 bg-red-500/20 text-red-500 text-[7px] font-black rounded-md uppercase tracking-tighter">Dev Mode</span>
+      <div v-if="isDev" class="mt-12 p-8 bg-black/40 rounded-[2.5rem] text-left border border-white/5 relative overflow-hidden">
+        <div class="flex items-center justify-between mb-6">
+           <p class="text-[10px] font-black uppercase text-red-400 tracking-widest opacity-40">Debug Information</p>
+           <span class="px-3 py-1 bg-red-500/10 text-red-500 text-[8px] font-black rounded-xl uppercase tracking-widest border border-red-500/20">Developer</span>
         </div>
-        <div class="max-h-32 overflow-y-auto scrollbar-hide">
-          <p class="text-[10px] font-mono text-red-400/80 leading-relaxed break-words">
+        <div class="max-h-40 overflow-y-auto scrollbar-hide">
+          <p class="text-[11px] font-mono text-red-400/70 leading-relaxed break-all">
             {{ error.stack || error.message }}
           </p>
         </div>
@@ -76,11 +77,11 @@ const isDev = import.meta.env.DEV
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
 .animate-reveal {
-  animation: reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: revealUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes reveal {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(50px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 </style>

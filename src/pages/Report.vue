@@ -1,12 +1,15 @@
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useLibraryStore } from '@/store/libraryStore'
+import { useLibraryStore } from '@/store/libraryStore.js'
+import { useUserStore } from '@/store/userStore.js'
 import { useRouter } from 'vue-router'
 
 const libraryStore = useLibraryStore()
+const userStore = useUserStore()
 const router = useRouter()
 
 const report = computed(() => libraryStore.intelligenceReport)
+const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
 
 onMounted(() => {
   window.scrollTo(0, 0)
@@ -14,98 +17,111 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-dark-bg text-text-main pt-32 pb-20 px-6 relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-b from-brand-primary/10 via-transparent to-transparent pointer-events-none animate-pulse"></div>
-    <div class="absolute top-0 left-0 w-full h-1 bg-brand-primary/20 shadow-neon animate-scan"></div>
+  <main class="min-h-screen bg-dark-bg text-text-main pt-32 pb-24 px-6 relative overflow-hidden font-outfit">
+    <div :style="{ backgroundColor: primaryColor }" class="absolute inset-0 opacity-[0.03] pointer-events-none"></div>
 
     <div v-if="report" class="max-w-4xl mx-auto relative z-10 animate-reveal">
-      <header class="mb-16 text-center">
-        <div class="inline-flex items-center gap-3 px-4 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-full mb-6">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-primary"></span>
-          </span>
-          <span class="text-[9px] font-black uppercase tracking-[0.4em] text-brand-primary italic">Intelligence Summary v1.9.9</span>
+      <header class="mb-20 text-center">
+        <div class="inline-flex items-center gap-3 px-5 py-2 bg-white/[0.03] border border-white/10 rounded-full mb-8 shadow-sm">
+          <div class="w-2 h-2 rounded-full animate-pulse" :style="{ backgroundColor: primaryColor }"></div>
+          <span class="text-[9px] font-black uppercase tracking-[0.3em] text-white/60">Community Insight v2.1.3</span>
         </div>
-        <h1 class="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase italic font-outfit leading-none">
-          Persona<br/><span class="text-brand-primary">Dossier.</span>
+        <h1 class="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none">
+          Taste<br/><span :style="{ color: primaryColor }">Profile.</span>
         </h1>
+        <p class="mt-6 text-text-muted text-xs md:text-sm font-medium opacity-40 uppercase tracking-[0.2em]">Personalized Collection Analytics</p>
       </header>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="p-10 bg-dark-surface/60 border border-white/5 rounded-[3.5rem] shadow-2xl relative overflow-hidden group backdrop-blur-xl">
-          <div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-primary/10 blur-[60px] rounded-full group-hover:bg-brand-primary/20 transition-all duration-1000"></div>
-          <p class="text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-8 opacity-40 italic">Psychographic Mapping</p>
-          <h2 class="text-4xl font-black text-white uppercase italic font-outfit mb-6 leading-tight">{{ report.persona }}</h2>
-          <p class="text-sm text-text-muted leading-relaxed italic opacity-80 border-l-2 border-brand-primary/30 pl-6">
-            "{{ report.description }}"
-          </p>
+        <div class="p-12 bg-dark-surface border border-white/5 rounded-[3.5rem] shadow-2xl relative overflow-hidden group transition-all hover:border-white/10">
+          <div class="absolute -right-10 -top-10 w-48 h-48 opacity-[0.05] blur-[60px] rounded-full transition-all duration-1000 group-hover:opacity-[0.1]" :style="{ backgroundColor: primaryColor }"></div>
+          
+          <p class="text-[10px] font-black text-text-muted uppercase tracking-widest mb-10 opacity-30">Member Persona</p>
+          <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic mb-8 leading-tight tracking-tighter">{{ report.persona }}</h2>
+          <div class="relative">
+            <i class="fa-solid fa-quote-left absolute -left-6 -top-4 opacity-10 text-4xl" :style="{ color: primaryColor }"></i>
+            <p class="text-sm md:text-base text-text-muted leading-relaxed font-medium opacity-80 pl-2">
+              {{ report.description }}
+            </p>
+          </div>
         </div>
 
-        <div class="p-10 bg-dark-surface/60 border border-white/5 rounded-[3.5rem] shadow-2xl backdrop-blur-xl">
-          <p class="text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-10 opacity-40 italic">Quality Assessment</p>
-          <div class="space-y-10">
-            <div class="flex justify-between items-end">
+        <div class="p-12 bg-dark-surface border border-white/5 rounded-[3.5rem] shadow-2xl flex flex-col justify-between transition-all hover:border-white/10">
+          <div>
+            <p class="text-[10px] font-black text-text-muted uppercase tracking-widest mb-12 opacity-30">Collection Quality</p>
+            <div class="flex justify-between items-end mb-8">
               <div class="space-y-1">
-                <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest leading-none">Mean Score Index</span>
-                <p class="text-[8px] text-brand-primary uppercase font-black italic">Database Average</p>
+                <span class="text-[11px] font-bold text-text-muted uppercase tracking-widest">Mean Score</span>
+                <p class="text-[9px] font-black uppercase opacity-40" :style="{ color: primaryColor }">Global MAL Index</p>
               </div>
-              <span class="text-5xl font-black italic tabular-nums text-white leading-none">{{ report.avgScore }}</span>
+              <span class="text-6xl md:text-7xl font-black italic tabular-nums text-white leading-none tracking-tighter">{{ report.avgScore }}</span>
             </div>
-            <div class="h-px bg-white/5 w-full"></div>
-            <div class="flex justify-between items-center">
-              <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Critic Tier</span>
-              <span class="px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-xl text-[10px] font-black uppercase italic tracking-tighter">
-                {{ report.qualityTier }}
-              </span>
-            </div>
+            <div class="h-px bg-white/5 w-full mb-8"></div>
+          </div>
+          
+          <div class="flex justify-between items-center bg-white/[0.02] p-6 rounded-3xl border border-white/5">
+            <span class="text-[10px] font-bold text-text-muted uppercase tracking-widest opacity-60">Curator Tier</span>
+            <span class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg" 
+                  :style="{ backgroundColor: primaryColor + '15', color: primaryColor, border: `1px solid ${primaryColor}30` }">
+              {{ report.qualityTier }}
+            </span>
           </div>
         </div>
 
-        <div class="md:col-span-2 p-12 bg-dark-surface/60 border border-white/5 rounded-[3.5rem] shadow-2xl backdrop-blur-xl">
-          <div class="flex items-center justify-between mb-12">
-            <p class="text-[9px] font-black text-text-muted uppercase tracking-[0.3em] opacity-40 italic">Genetic Genre Distribution</p>
-            <span class="text-[8px] font-bold text-text-muted opacity-20 uppercase tracking-widest">Total Samples: {{ report.total }}</span>
+        <div class="md:col-span-2 p-12 bg-dark-surface border border-white/5 rounded-[3.5rem] shadow-2xl">
+          <div class="flex items-center justify-between mb-16 px-2">
+            <p class="text-[10px] font-black text-text-muted uppercase tracking-widest opacity-30">Genre Preferences</p>
+            <span class="text-[9px] font-bold text-text-muted opacity-20 uppercase tracking-widest">Database: {{ report.total }} Saved Titles</span>
           </div>
-          <div class="grid grid-cols-1 gap-10">
-            <div v-for="[name, count] in report.topGenres" :key="name" class="space-y-4">
-              <div class="flex justify-between items-center px-2">
-                <div class="flex items-center gap-4">
-                  <div class="w-1.5 h-1.5 rounded-full bg-brand-primary shadow-neon"></div>
-                  <span class="text-xs font-black uppercase italic text-white tracking-widest">{{ name }}</span>
+          
+          <div class="space-y-12">
+            <div v-for="[name, count] in report.topGenres" :key="name" class="group">
+              <div class="flex justify-between items-center mb-4 px-2">
+                <div class="flex items-center gap-5">
+                  <div class="w-2 h-2 rounded-full transition-all group-hover:scale-150 shadow-lg" :style="{ backgroundColor: primaryColor }"></div>
+                  <span class="text-sm md:text-base font-black uppercase text-white tracking-widest">{{ name }}</span>
                 </div>
-                <span class="text-[10px] font-black text-brand-primary italic opacity-60 tabular-nums">{{ count }} ENTRIES</span>
+                <span class="text-[11px] font-bold opacity-30 tabular-nums">{{ count }} Titles</span>
               </div>
-              <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden p-[2px] border border-white/5">
-                <div class="h-full bg-brand-primary rounded-full shadow-neon transition-all duration-[1.5s] ease-out" 
-                     :style="{ width: `${(count / report.total) * 100}%` }"></div>
+              <div class="h-2.5 w-full bg-white/[0.03] rounded-full overflow-hidden p-0.5 border border-white/5 shadow-inner">
+                <div class="h-full rounded-full transition-all duration-[2s] ease-out shadow-lg" 
+                     :style="{ width: `${(count / report.total) * 100}%`, backgroundColor: primaryColor }"></div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="mt-24 flex flex-col items-center gap-8">
+      <div class="mt-28 flex flex-col items-center gap-10">
         <button @click="router.push('/library')" 
-                class="px-12 py-5 bg-white text-black rounded-[2rem] font-black text-[10px] uppercase tracking-[0.4em] hover:bg-brand-primary hover:text-white transition-all duration-500 shadow-2xl italic active:scale-95">
-          <i class="fa-solid fa-chevron-left mr-3"></i> Return to Terminal
+                class="px-16 py-6 bg-white text-black rounded-3xl font-black text-[11px] uppercase tracking-[0.4em] hover:scale-105 active:scale-95 transition-all shadow-2xl group flex items-center gap-4">
+          <i class="fa-solid fa-arrow-left text-[10px] group-hover:-translate-x-2 transition-transform"></i> 
+          Back to Collection
         </button>
-        <p class="text-[9px] text-text-muted font-bold opacity-20 uppercase tracking-[0.5em] italic leading-none">
-          Data finalized at {{ new Date().toLocaleDateString() }} • Malang Research Center
-        </p>
+        <div class="flex flex-col items-center gap-4">
+          <p class="text-[10px] text-text-muted font-bold opacity-30 uppercase tracking-[0.4em]">
+            Analysis finalized on {{ new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) }}
+          </p>
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-px bg-white/10"></span>
+            <span class="text-[10px] font-black text-white/10 uppercase tracking-widest">Malangan Community Hub</span>
+            <span class="w-8 h-px bg-white/10"></span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div v-else class="text-center py-40 animate-reveal">
-      <div class="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-10 border border-brand-primary/20">
-        <i class="fa-solid fa-triangle-exclamation text-3xl text-brand-primary animate-pulse"></i>
+    <div v-else class="text-center py-48 animate-reveal">
+      <div class="w-28 h-28 rounded-[2.5rem] flex items-center justify-center mx-auto mb-12 border border-white/5 bg-white/[0.02] shadow-xl">
+        <i class="fa-solid fa-chart-pie text-4xl opacity-20" :style="{ color: primaryColor }"></i>
       </div>
-      <h2 class="text-3xl md:text-5xl font-black text-white uppercase italic font-outfit tracking-tighter mb-4">Insufficient Samples.</h2>
-      <p class="text-sm text-text-muted max-w-sm mx-auto opacity-50 italic leading-relaxed">
-        Sistem memerlukan minimal <span class="text-brand-primary font-black">5 target aktif</span> di dalam Library untuk melakukan analisis psikografis dan pemetaan DNA Persona.
+      <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-6">Need More Data.</h2>
+      <p class="text-sm md:text-base text-text-muted max-w-md mx-auto opacity-50 font-medium leading-relaxed mb-12">
+        Sistem membutuhkan minimal <span :style="{ color: primaryColor }" class="font-black">5 judul aktif</span> di dalam koleksi Anda untuk menghasilkan profil selera yang akurat.
       </p>
-      <button @click="router.push('/search')" class="mt-12 text-[10px] font-black uppercase tracking-[0.4em] text-brand-primary hover:text-white transition-colors italic">
-        Initialize Target Acquisition <i class="fa-solid fa-arrow-right ml-2"></i>
+      <button @click="router.push('/search')" 
+              class="px-10 py-4 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-white hover:bg-white hover:text-black transition-all shadow-xl">
+        Browse Archive <i class="fa-solid fa-arrow-right ml-3 text-[8px]"></i>
       </button>
     </div>
   </main>
@@ -113,15 +129,18 @@ onMounted(() => {
 
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
-.shadow-neon { box-shadow: 0 0 15px var(--color-brand-primary); }
 
-@keyframes scan {
-  0% { transform: translateY(0); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
+.animate-reveal { 
+  animation: revealUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; 
 }
-.animate-scan { animation: scan 4s linear infinite; }
 
-.animate-reveal { animation: revealUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-@keyframes revealUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes revealUp { 
+  from { opacity: 0; transform: translateY(40px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+
+/* Chrome/Safari Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
 </style>

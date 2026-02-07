@@ -1,6 +1,11 @@
 <script setup>
+import { computed } from 'vue'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 import { APP_CONFIG } from '@/core/constants/APP_CONFIG'
+import { useUserStore } from '@/store/userStore.js'
+
+const userStore = useUserStore()
+const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
 
 const {
   offlineReady,
@@ -17,41 +22,42 @@ const close = () => {
 <template>
   <Transition name="slide-up">
     <div v-if="offlineReady || needRefresh" 
-         class="pwa-toast fixed bottom-6 left-6 right-6 md:left-auto md:right-10 md:w-96 z-[9999] bg-dark-surface/90 backdrop-blur-2xl border border-white/10 p-8 rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.8)] overflow-hidden group">
+         class="fixed bottom-6 left-6 right-6 md:left-auto md:right-10 md:w-[400px] z-[9999] bg-dark-surface/90 backdrop-blur-3xl border border-white/10 p-10 rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden group font-outfit">
       
-      <div class="absolute -right-20 -top-20 w-40 h-40 bg-brand-primary/10 blur-[80px] rounded-full group-hover:bg-brand-primary/20 transition-all"></div>
+      <div :style="{ backgroundColor: primaryColor }" class="absolute -right-20 -top-20 w-48 h-48 opacity-[0.08] blur-[80px] rounded-full group-hover:opacity-[0.12] transition-all"></div>
 
       <div class="relative z-10">
-        <div class="flex items-center gap-4 mb-6">
-          <div class="w-12 h-12 bg-brand-primary/10 rounded-2xl flex items-center justify-center border border-brand-primary/20">
-            <i class="fa-solid fa-cloud-arrow-down text-brand-primary text-xl animate-bounce"></i>
+        <div class="flex items-center gap-6 mb-8">
+          <div :style="{ backgroundColor: primaryColor + '15', color: primaryColor, borderColor: primaryColor + '20' }"
+               class="w-14 h-14 rounded-2xl flex items-center justify-center border shadow-lg">
+            <i class="fa-solid fa-cloud-arrow-down text-xl animate-bounce"></i>
           </div>
           <div>
-            <h4 class="text-sm font-black text-white uppercase tracking-tighter font-outfit italic leading-none">
-              {{ needRefresh ? 'System Update Available' : 'Vault Ready Offline' }}
+            <h4 class="text-base font-black text-white uppercase tracking-tighter italic leading-none">
+              {{ needRefresh ? 'New Update Ready' : 'Ready Offline' }}
             </h4>
-            <p class="text-[9px] font-black text-brand-primary uppercase tracking-[0.3em] mt-1 opacity-60">
-              Protocol v{{ APP_CONFIG.VERSION }}
+            <p class="text-[9px] font-black text-text-muted uppercase tracking-[0.4em] mt-2 opacity-40">
+              Community Build v{{ APP_CONFIG.VERSION }}
             </p>
           </div>
         </div>
 
-        <p class="text-xs text-text-muted font-medium mb-8 leading-relaxed italic opacity-70">
+        <p class="text-[13px] text-text-muted font-medium mb-10 leading-relaxed opacity-60">
           {{ needRefresh 
-            ? 'Inteligensi baru telah dideploy ke cloud. Segarkan sistem untuk sinkronisasi pilar data terbaru.' 
-            : 'Aplikasi telah terenkripsi dalam cache lokal. WibuPedia siap diakses tanpa koneksi internet.' 
+            ? 'Fitur dan pembaruan terbaru sudah tersedia. Segarkan aplikasi sekarang untuk mendapatkan pengalaman terbaik.' 
+            : 'Aplikasi sudah tersimpan di memori browser. WibuPedia kini dapat kamu akses meskipun tanpa koneksi internet.' 
           }}
         </p>
 
-        <div class="flex gap-3">
+        <div class="flex gap-4">
           <button v-if="needRefresh" 
                   @click="updateServiceWorker()"
-                  class="flex-1 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-brand-primary hover:text-white transition-all active:scale-95 italic shadow-2xl shadow-white/5">
-            Sync Now
+                  class="flex-1 py-5 bg-white text-black rounded-2xl font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
+            Update Now
           </button>
           <button @click="close"
-                  class="px-8 py-4 bg-white/5 border border-white/5 text-text-muted rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-white/10 transition-all italic">
-            Dismiss
+                  class="flex-1 py-5 bg-white/5 border border-white/10 text-white font-black rounded-2xl text-[11px] uppercase tracking-widest hover:bg-white/10 transition-all">
+            Later
           </button>
         </div>
       </div>
@@ -62,17 +68,18 @@ const close = () => {
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
 
-.pwa-toast {
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-/* Animations */
+/* 🚀 SMOOTH TRANSITIONS */
 .slide-up-enter-active, .slide-up-leave-active {
-  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .slide-up-enter-from, .slide-up-leave-to {
   opacity: 0;
-  transform: translateY(100px) scale(0.9);
-  filter: blur(10px);
+  transform: translateY(60px) scale(0.95);
+  filter: blur(20px);
+}
+
+/* Chrome/Safari Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
 }
 </style>

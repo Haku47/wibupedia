@@ -1,48 +1,47 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useLibraryStore } from '@/store/libraryStore'
+import { useUserStore } from '@/store/userStore'
 
 const libraryStore = useLibraryStore()
+const userStore = useUserStore()
 const fileInput = ref(null)
+
+const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
 
 defineProps({
   themeColor: String,
   themeBg: String
 })
 
-// --- 🛡️ BYPASS PROTOCOL ---
+// --- 🔄 COLLECTION MANAGEMENT ---
 const initiateExport = () => {
-  console.log("System: Initiating Data Export Protocol...");
+  console.log("Community Hub: Preparing Collection Export...");
   
-  // Verifikasi apakah fungsi tersedia di Store
   if (typeof libraryStore.exportLibrary !== 'function') {
-    console.error("Critical Error: exportLibrary function not found in Store!");
-    alert("System Error: Protokol Ekspor tidak ditemukan di Core Engine.");
+    console.error("Logic Error: Export function missing in Store.");
+    alert("Maaf, fitur ekspor sedang tidak tersedia di sistem.");
     return
   }
 
   const success = libraryStore.exportLibrary()
-  if (success) {
-    console.log("System: Export successful.");
-  } else {
-    console.warn("System: Export failed in store logic.");
-  }
+  if (!success) console.warn("Community Hub: Export failed.");
 }
 
 const handleImport = async (e) => {
   const file = e.target.files[0]
   if (!file) return
 
-  if (confirm('⚠️ PERINGATAN: Import data akan menimpa seluruh koleksi saat ini. Lanjutkan proses sinkronisasi?')) {
+  if (confirm('⚠️ PERHATIAN: Proses ini akan mengganti seluruh koleksi Anda dengan data dari file yang dipilih. Lanjutkan?')) {
     try {
-      console.log("System: Restoring Archive...");
+      console.log("Community Hub: Restoring Collection...");
       const success = await libraryStore.importLibrary(file)
       if (success) {
-        alert('Archive Restored: Database berhasil diperbarui.')
+        alert('Koleksi berhasil dipulihkan! Database telah diperbarui.')
         window.location.reload()
       }
     } catch (err) {
-      alert('Error: Dekripsi data gagal.')
+      alert('Gagal memproses file. Pastikan format file JSON sudah benar.')
       console.error(err)
     }
   }
@@ -51,13 +50,13 @@ const handleImport = async (e) => {
 </script>
 
 <template>
-  <div class="mt-20 pt-10 border-t border-white/5 relative z-[100]">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+  <div class="mt-20 pt-12 border-t border-white/5 relative z-10 font-outfit">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
       
-      <div class="pointer-events-none">
-        <h4 class="text-white text-xs font-black uppercase tracking-[0.3em] mb-2 italic opacity-80">Data Protocol</h4>
-        <p class="text-text-muted text-[9px] uppercase tracking-widest opacity-40 leading-relaxed max-w-sm">
-          Ekspor database Library Host ke dalam format JSON untuk cadangan fisik atau sinkronisasi antar perangkat.
+      <div class="space-y-2">
+        <h4 class="text-white text-[11px] font-black uppercase tracking-[0.4em] opacity-40">Data Management</h4>
+        <p class="text-text-muted text-xs font-medium leading-relaxed max-w-sm opacity-50">
+          Simpan cadangan koleksi Anda ke format JSON atau pulihkan data dari perangkat lain dengan mudah.
         </p>
       </div>
 
@@ -65,19 +64,20 @@ const handleImport = async (e) => {
         <button 
           @click.stop="initiateExport"
           type="button"
-          class="group flex items-center gap-3 px-6 py-3.5 bg-white/5 border border-white/10 rounded-2xl transition-all hover:bg-brand-primary/10 hover:border-brand-primary/30 active:scale-95 cursor-pointer"
+          class="group flex items-center gap-4 px-8 py-4 bg-white/[0.03] border border-white/10 rounded-2xl transition-all hover:bg-white/[0.08] active:scale-95"
         >
-          <i class="fa-solid fa-download text-[10px] opacity-40 group-hover:opacity-100 group-hover:text-brand-primary transition-all"></i>
-          <span class="text-[9px] font-black uppercase tracking-[0.2em] text-text-muted group-hover:text-white">Generate Backup</span>
+          <i class="fa-solid fa-download text-xs text-text-muted group-hover:scale-110 transition-transform" 
+             :style="{ '--hover-color': primaryColor }"></i>
+          <span class="text-[10px] font-black uppercase tracking-widest text-text-muted group-hover:text-white transition-colors">Export Backup</span>
         </button>
 
         <button 
           @click.stop="fileInput.click()"
           type="button"
-          class="group flex items-center gap-3 px-6 py-3.5 bg-white/5 border border-white/10 rounded-2xl transition-all hover:bg-emerald-500/10 hover:border-emerald-500/30 active:scale-95 cursor-pointer"
+          class="group flex items-center gap-4 px-8 py-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl transition-all hover:bg-emerald-500/10 hover:border-emerald-500/30 active:scale-95"
         >
-          <i class="fa-solid fa-upload text-[10px] opacity-40 group-hover:opacity-100 group-hover:text-emerald-500 transition-all"></i>
-          <span class="text-[9px] font-black uppercase tracking-[0.2em] text-text-muted group-hover:text-white">Restore Archive</span>
+          <i class="fa-solid fa-upload text-xs text-emerald-500/60 group-hover:scale-110 transition-transform"></i>
+          <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 group-hover:text-emerald-400 transition-colors">Restore Collection</span>
         </button>
 
         <input 
@@ -94,6 +94,15 @@ const handleImport = async (e) => {
 </template>
 
 <style scoped>
-.italic { font-style: italic; }
-button { cursor: pointer !important; } /* Paksa kursor pointer */
+.font-outfit { font-family: 'Outfit', sans-serif; }
+
+button {
+  cursor: pointer !important;
+  user-select: none;
+}
+
+/* Custom Hover Icon Color logic if needed */
+button:hover i[style*="--hover-color"] {
+  color: v-bind(primaryColor) !important;
+}
 </style>

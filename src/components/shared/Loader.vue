@@ -1,8 +1,14 @@
 <script setup>
+import { computed } from 'vue'
+import { useUserStore } from '@/store/userStore.js'
+
+const userStore = useUserStore()
+const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
+
 defineProps({
   message: {
     type: String,
-    default: 'ACCESSING ARCHIVE...'
+    default: 'DISCOVERING CONTENT...'
   },
   fullScreen: {
     type: Boolean,
@@ -14,43 +20,67 @@ defineProps({
 <template>
   <div 
     :class="[
-      'flex flex-col items-center justify-center gap-6 transition-opacity duration-500',
-      fullScreen ? 'fixed inset-0 bg-dark-bg/95 backdrop-blur-xl z-[300]' : 'py-24 w-full'
+      'flex flex-col items-center justify-center gap-10 transition-all duration-700 font-outfit',
+      fullScreen ? 'fixed inset-0 bg-dark-bg/98 backdrop-blur-2xl z-[300]' : 'py-32 w-full'
     ]"
   >
-    <div class="relative flex items-center justify-center h-24 w-24">
+    <div class="relative flex items-center justify-center h-28 w-28">
       <div class="absolute inset-0 border-[3px] border-white/5 rounded-full"></div>
       
-      <div class="absolute inset-0 border-[3px] border-t-brand-primary border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+      <div class="absolute inset-0 border-[3px] border-transparent border-t-current rounded-full animate-spin-smooth"
+           :style="{ color: primaryColor }"></div>
       
-      <div class="h-10 w-10 bg-brand-primary/10 rounded-2xl flex items-center justify-center border border-brand-primary/20 animate-pulse rotate-45">
-         <div class="h-4 w-4 bg-brand-primary rounded-lg shadow-neon"></div>
+      <div class="h-12 w-12 rounded-[1.2rem] flex items-center justify-center border transition-all duration-700 animate-pulse-soft"
+           :style="{ backgroundColor: primaryColor + '15', borderColor: primaryColor + '30' }">
+         <div class="h-3 w-3 rounded-full shadow-lg animate-ping"
+              :style="{ backgroundColor: primaryColor }"></div>
       </div>
     </div>
 
-    <div class="flex flex-col items-center gap-3">
-      <div class="flex items-center gap-3">
-         <span class="w-8 h-px bg-brand-primary/20"></span>
-         <p class="text-brand-primary font-black tracking-[0.4em] uppercase text-[10px] italic">
-           {{ message }}
+    <div class="flex flex-col items-center gap-6">
+      <div class="flex items-center gap-4">
+         <div class="w-8 h-px opacity-20" :style="{ backgroundColor: primaryColor }"></div>
+         <p class="font-black tracking-[0.6em] uppercase text-[10px] text-white/40">
+            {{ message }}
          </p>
-         <span class="w-8 h-px bg-brand-primary/20"></span>
+         <div class="w-8 h-px opacity-20" :style="{ backgroundColor: primaryColor }"></div>
       </div>
       
-      <div class="flex gap-2 h-1 items-center">
-        <span class="w-1.5 h-1.5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-        <span class="w-1.5 h-1.5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-        <span class="w-1.5 h-1.5 bg-brand-primary rounded-full animate-bounce"></span>
+      <div class="flex gap-3 h-1.5 items-center">
+        <span class="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.3s]" :style="{ backgroundColor: primaryColor }"></span>
+        <span class="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.15s]" :style="{ backgroundColor: primaryColor }"></span>
+        <span class="w-1.5 h-1.5 rounded-full animate-bounce" :style="{ backgroundColor: primaryColor }"></span>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.shadow-neon { box-shadow: 0 0 15px var(--color-brand-primary); }
+.font-outfit { font-family: 'Outfit', sans-serif; }
 
-/* Optimize render with hardware acceleration */
-.animate-spin, .animate-pulse, .animate-bounce {
+/* 🚀 PERFORMANCE OPTIMIZED ANIMATIONS */
+
+.animate-spin-smooth {
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Optimize Hardware Acceleration */
+.animate-spin-smooth, .animate-pulse-soft, .animate-bounce, .animate-ping {
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
