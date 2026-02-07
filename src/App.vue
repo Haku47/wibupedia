@@ -7,6 +7,7 @@ import ErrorBoundary from '@/components/shared/ErrorBoundary.vue'
 import LoadingScreen from '@/components/shared/LoadingScreen.vue'
 import QuickSearchOverlay from '@/components/shared/QuickSearchOverlay.vue'
 import ReloadPrompt from '@/components/shared/ReloadPrompt.vue'
+import { SpeedInsights } from '@vercel/speed-insights/vue'
 
 // --- STATES ---
 const isInitialLoading = ref(true) 
@@ -80,6 +81,7 @@ onUnmounted(() => {
 
     <Footer />
     <ReloadPrompt />
+    <SpeedInsights />
   </div>
 </template>
 
