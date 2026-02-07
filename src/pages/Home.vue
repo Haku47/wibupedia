@@ -17,9 +17,6 @@ const activeTab = ref('harian')
 const carouselRef = ref(null)
 const topTenRef = ref(null)
 const currentIndex = ref(0)
-const topTenScrollProgress = ref(0)
-const topTenIndex = ref(0)
-const showBackToTop = ref(false)
 const toast = ref({ show: false, message: '' })
 const topTenItems = ref([])
 
@@ -32,9 +29,7 @@ const spotlightItems = computed(() => items.value.slice(0, 6))
 const greeting = computed(() => {
   const hour = new Date().getHours()
   const firstName = userStore.profile.name.split(' ')[0]
-  let timeStr = 'Malam'
-  if (hour < 12) timeStr = 'Pagi'
-  else if (hour < 18) timeStr = 'Siang'
+  let timeStr = hour < 12 ? 'Pagi' : hour < 18 ? 'Siang' : 'Malam'
   return `Okaeri, ${firstName}!` 
 })
 
@@ -60,19 +55,7 @@ const toggleBookmark = (anime) => {
   }
 }
 
-const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
 // --- TOP 10 ENGINE ---
-const handleTopTenScroll = (e) => {
-  const { scrollLeft, scrollWidth, clientWidth } = e.target
-  const maxScroll = scrollWidth - clientWidth
-  topTenScrollProgress.value = (scrollLeft / maxScroll) * 100
-  const itemWidth = window.innerWidth < 768 ? 138 : 186
-  topTenIndex.value = Math.round(scrollLeft / itemWidth)
-}
-
 const startTopTenAuto = () => {
   stopTopTenAuto()
   topTenAutoInterval = setInterval(() => {
@@ -116,7 +99,7 @@ const loadData = async (type) => {
 }
 
 onMounted(async () => {
-  window.addEventListener('scroll', () => { showBackToTop.value = window.scrollY > 500 }, { passive: true })
+  // 🛡️ Scroll listener removed for Ultra-Lean Build
   startAutoSlide()
   startTopTenAuto()
   
@@ -140,7 +123,7 @@ onUnmounted(() => {
   <main class="min-h-screen pb-20 bg-dark-bg relative overflow-x-hidden selection:bg-brand-primary/30">
     
     <Transition name="toast">
-      <div v-if="toast.show" class="fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-brand-primary px-8 py-3 rounded-2xl shadow-[0_20px_40px_rgba(59,130,246,0.3)] text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/10 flex items-center gap-3 italic">
+      <div v-if="toast.show" class="fixed top-24 left-1/2 -translate-x-1/2 z-[400] bg-brand-primary px-8 py-3 rounded-2xl shadow-neon text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/10 flex items-center gap-3 italic">
         <i class="fa-solid fa-shield-check"></i> {{ toast.message }}
       </div>
     </Transition>
@@ -199,11 +182,9 @@ onUnmounted(() => {
     <section class="max-w-7xl mx-auto px-6 mb-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 md:gap-10">
       <div class="lg:col-span-4 bg-dark-surface border border-dark-border p-10 rounded-[3rem] relative overflow-hidden group shadow-2xl">
         <div class="absolute -right-20 -top-20 w-56 h-56 bg-brand-primary/10 blur-[90px] rounded-full group-hover:bg-brand-primary/20 transition-all duration-1000"></div>
-        <div class="relative z-10 flex flex-col justify-between h-full">
+        <div class="relative z-10 flex flex-col justify-between h-full text-white">
           <div>
-            <h3 class="text-4xl md:text-5xl font-black font-outfit text-white mb-2 tracking-tighter italic uppercase leading-none break-words">
-              {{ greeting }}
-            </h3>
+            <h3 class="text-4xl md:text-5xl font-black font-outfit mb-2 tracking-tighter italic uppercase leading-none break-words">{{ greeting }}</h3>
             <p class="text-text-muted font-black text-[9px] uppercase tracking-[0.5em] opacity-30 italic">Terminal Access Verified</p>
           </div>
           <div class="mt-12 p-8 bg-brand-primary text-white rounded-[2.5rem] shadow-neon">
@@ -216,15 +197,15 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div class="lg:col-span-8 bg-dark-surface border border-dark-border p-10 rounded-[3rem] overflow-hidden relative group/top shadow-2xl">
+      <div class="lg:col-span-8 bg-dark-surface border border-dark-border p-10 rounded-[3rem] overflow-hidden relative group/top shadow-2xl text-white">
         <div class="flex items-center justify-between mb-10">
           <div class="flex items-center gap-5">
              <div class="w-2.5 h-10 bg-brand-primary rounded-full shadow-neon"></div>
-             <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter text-white font-outfit italic">Global Trending</h3>
+             <h3 class="text-xl md:text-2xl font-black uppercase tracking-tighter font-outfit italic">Global Trending</h3>
           </div>
           <button @click="rollGacha" class="px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase text-brand-primary tracking-widest hover:bg-brand-primary hover:text-white transition-all italic active:scale-95">Shuffle</button>
         </div>
-        <div ref="topTenRef" @scroll="handleTopTenScroll" @mouseenter="stopTopTenAuto" @mouseleave="startTopTenAuto"
+        <div ref="topTenRef" @mouseenter="stopTopTenAuto" @mouseleave="startTopTenAuto"
              class="flex gap-8 overflow-x-auto pb-6 snap-x scrollbar-hide">
           <div v-for="(item, idx) in topTenItems" :key="item.mal_id" 
                class="relative flex-shrink-0 w-36 md:w-44 snap-start group/card cursor-pointer"
@@ -241,9 +222,9 @@ onUnmounted(() => {
     </section>
 
     <section class="max-w-7xl mx-auto px-6">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-10 mb-20">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-10 mb-20 text-white">
         <div>
-           <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter font-outfit uppercase italic leading-none">Matrix <span class="text-brand-primary transition-colors">Catalog.</span></h2>
+           <h2 class="text-4xl md:text-6xl font-black tracking-tighter font-outfit uppercase italic leading-none">List <span class="text-brand-primary transition-colors">Catalog</span></h2>
            <p class="text-[9px] font-black text-text-muted uppercase tracking-[0.4em] mt-4 opacity-30 italic">Live Synchronization Protocol</p>
         </div>
         <div class="flex p-1.5 bg-dark-surface border border-white/5 rounded-[2.2rem] shadow-2xl w-full md:w-auto backdrop-blur-xl">
@@ -281,13 +262,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <Transition name="fade-scale">
-      <button v-if="showBackToTop" @click="scrollToTop" 
-              class="fixed bottom-10 right-10 w-16 h-16 md:w-20 md:h-20 bg-brand-primary text-white rounded-[2rem] shadow-neon z-[100] active:scale-90 transition-all flex items-center justify-center border border-white/10">
-        <i class="fa-solid fa-chevron-up text-xl"></i>
-      </button>
-    </Transition>
-  </main>
+    </main>
 </template>
 
 <style scoped>
@@ -296,7 +271,7 @@ onUnmounted(() => {
 .shadow-neon { box-shadow: 0 0 20px var(--color-brand-primary); }
 
 /* 🚀 PERFORMANCE ENHANCEMENTS */
-.animate-float-poster, .animate-reveal-text, .group-hover\/hero:rotate-0 {
+.animate-float-poster, .animate-reveal-text {
   will-change: transform, opacity;
 }
 
@@ -309,7 +284,4 @@ onUnmounted(() => {
 
 .toast-enter-active, .toast-leave-active { transition: all 0.4s ease; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translate(-50%, -20px); }
-
-.fade-scale-enter-active, .fade-scale-leave-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.fade-scale-enter-from { opacity: 0; transform: scale(0.5); }
 </style>
