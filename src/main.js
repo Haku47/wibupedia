@@ -6,10 +6,6 @@ import App from './App.vue'
 
 const app = createApp(App)
 
-// --- PWA REGISTER ENGINE ---
-import { registerSW } from 'virtual:pwa-register'
-registerSW({ immediate: true })
-
 app.use(createPinia())
 app.use(router)
 app.mount('#app')

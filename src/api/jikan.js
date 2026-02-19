@@ -2,50 +2,53 @@ import axios from 'axios';
 import { API_URL } from '@/core/constants/API_URL';
 import { APP_CONFIG } from '@/core/constants/APP_CONFIG';
 
-// 1. Inisialisasi Instance dengan Serializer Fix
 const jikanClient = axios.create({
   baseURL: API_URL.BASE,
-  timeout: APP_CONFIG.API.TIMEOUT,
+  timeout: 20000, // 🛡️ Host, saya naikkan ke 20 detik agar tidak mudah 504
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  // 🛡️ SHIELD: Paksa Axios tidak menggunakan format bracket [] untuk nested objects
   paramsSerializer: {
     indexes: null 
   }
 });
 
-// 2. Interceptor Request
-jikanClient.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
+// --- ⚡ INTERNAL HELPER: SLEEP ---
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 3. Interceptor Response (Data Flattening)
 jikanClient.interceptors.response.use(
   (response) => response.data,
-  (error) => {
-    const status = error.response?.status;
-    if (status === 429) console.error('WibuPedia: Rate Limit Hit! Harap tunggu.');
-    else if (status === 404) console.error('WibuPedia: Data tidak ditemukan.');
+  async (error) => {
+    const { config, response } = error;
+    const status = response?.status;
+
+    // 🛡️ STRATEGI 1: AUTO-RETRY JIKA KENA RATE LIMIT (429)
+    if (status === 429 && !config._retry) {
+      config._retry = true;
+      console.warn('WibuPedia: Rate Limit Hit. Memperlambat request...');
+      await sleep(2000); // Tunggu 2 detik baru coba lagi otomatis
+      return jikanClient(config);
+    }
+
+    // 🛡️ STRATEGI 2: HANDLING 504 (TIMEOUT)
+    if (status === 504) {
+      console.error('WibuPedia: Server Jikan sedang sibuk (504). Coba lagi nanti.');
+    }
+
+    if (status === 404) console.error('WibuPedia: Data tidak ditemukan.');
+    
     return Promise.reject(error);
   }
 );
 
-// 4. Anime Service
 export const animeService = {
-  /**
-   * FIX: Menerima object params agar support filter & page dari useJikan
-   * params bisa berupa { page, filter }
-   */
   getTopAnime(params = {}) {
-    // Jika Host mengirim angka (bukan object), kita bungkus jadi object
     const normalizedParams = typeof params === 'number' ? { page: params } : params;
-    
     return jikanClient.get(API_URL.ANIME.TOP, { 
       params: { 
         limit: APP_CONFIG.API.DEFAULT_PAGE_SIZE,
+        sfw: true, // Pastikan SFW aktif agar tidak kena blokir filter
         ...normalizedParams 
       } 
     });
@@ -70,14 +73,9 @@ export const animeService = {
     return jikanClient.get(API_URL.ANIME.SEASONAL, { 
       params: { ...normalizedParams } 
     });
-  },
-
-  getRecommendations(id) {
-    return jikanClient.get(API_URL.ANIME.RECOMMENDATIONS(id));
   }
 };
 
-// 5. Manga Service
 export const mangaService = {
   getTopManga(params = {}) {
     const normalizedParams = typeof params === 'number' ? { page: params } : params;

@@ -139,7 +139,7 @@ onUnmounted(() => { clearTimeout(debounceTimer); clear() })
         <div class="p-8 flex items-center justify-between border-b border-white/5 shrink-0">
           <div class="flex items-center gap-4">
             <div :class="[theme.bg]" class="w-1.5 h-7 rounded-full shadow-lg"></div>
-            <h3 class="text-xl font-black uppercase tracking-tighter text-white italic">Archive Filter.</h3>
+            <h3 class="text-xl font-black uppercase tracking-tighter text-white ">Archive Filter.</h3>
           </div>
           <button @click="isFilterOpen = false" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 hover:bg-white/10 transition-all">
             <i class="fa-solid fa-xmark text-sm"></i>
@@ -185,10 +185,10 @@ onUnmounted(() => { clearTimeout(debounceTimer); clear() })
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
         <div class="space-y-4">
           <div class="flex items-center gap-3">
-            <span :class="[theme.color, theme.bg]" class="px-3 py-1 bg-opacity-10 text-[9px] font-black uppercase tracking-widest rounded-full border border-current italic transition-all">Archive Protocol v2.6.5</span>
+            <span :class="[theme.color, theme.bg]" class="px-3 py-1 bg-opacity-10 text-[9px] font-black uppercase tracking-widest rounded-full border border-current  transition-all">Archive Protocol v2.6.5</span>
             <div class="h-px w-8 bg-white/10"></div>
           </div>
-          <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase italic">
+          <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none uppercase ">
             Global<br/><span :class="theme.color" class="transition-colors duration-700">{{ theme.label }}.</span>
           </h1>
         </div>
@@ -196,7 +196,7 @@ onUnmounted(() => { clearTimeout(debounceTimer); clear() })
         <div class="flex p-1.5 bg-dark-surface border border-white/5 rounded-[2rem] shadow-xl backdrop-blur-xl shrink-0 overflow-x-auto scrollbar-hide">
           <button v-for="type in ['tv', 'movie', 'manga', 'novel', 'donghua']" :key="type" @click="toggleType(type)" 
                   :class="searchType === type ? [theme.bg, 'text-white shadow-xl scale-105'] : 'text-text-muted hover:text-white'" 
-                  class="px-8 md:px-10 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all italic whitespace-nowrap">{{ type }}</button>
+                  class="px-8 md:px-10 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all  whitespace-nowrap">{{ type }}</button>
         </div>
       </div>
 
@@ -218,7 +218,7 @@ onUnmounted(() => { clearTimeout(debounceTimer); clear() })
 
       <div class="relative min-h-[500px] z-10">
         <EmptyState v-if="!searchQuery && !loading" icon="fa-solid fa-satellite-dish" 
-                    title="Initialize Scan" :description="`Gunakan konsol di atas untuk memindai archive ${theme.label} Malangan.`" />
+                    title="Initialize Scan" :description="`Gunakan konsol di atas untuk memindai archive ${theme.label} di WibuPedia`" />
         
         <div v-else-if="loading && items.length === 0" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
           <SkeletonCard v-for="n in 12" :key="n" />
@@ -226,7 +226,7 @@ onUnmounted(() => { clearTimeout(debounceTimer); clear() })
 
         <div v-else>
           <div class="flex items-center justify-between mb-10 px-4">
-            <h2 class="text-[10px] font-black text-text-muted uppercase tracking-[0.5em] flex items-center gap-4 opacity-40 italic">
+            <h2 class="text-[10px] font-black text-text-muted uppercase tracking-[0.5em] flex items-center gap-4 opacity-40 ">
               <span class="w-10 h-0.5 rounded-full" :class="theme.bg"></span>
               Discovery Results
             </h2>
@@ -260,7 +260,7 @@ onUnmounted(() => { clearTimeout(debounceTimer); clear() })
            class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] px-10 py-5 rounded-[2rem] shadow-2xl backdrop-blur-2xl border border-white/10 flex items-center gap-4 min-w-[300px]"
            :class="toast.type === 'add' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'">
         <div class="w-2 h-2 rounded-full animate-pulse" :class="toast.type === 'add' ? 'bg-emerald-400' : 'bg-red-400'"></div>
-        <span class="text-[11px] font-black uppercase tracking-[0.2em] italic">{{ toast.message }}</span>
+        <span class="text-[11px] font-black uppercase tracking-[0.2em] ">{{ toast.message }}</span>
       </div>
     </Transition>
   </main>

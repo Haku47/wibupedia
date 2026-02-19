@@ -16,7 +16,10 @@ import SkeletonCard from '@/components/shared/SkeletonCard.vue'
 const router = useRouter()
 const libraryStore = useLibraryStore()
 const userStore = useUserStore() 
-const { items, loading, fetchTrending, search, clear } = useJikan()
+
+// Instance 1: Untuk Discovery Archive (Konten Bawah)
+const archiveEngine = useJikan()
+const { items, loading, clear } = archiveEngine
 
 // --- STATES ---
 const activeTab = ref('tv') 
@@ -24,7 +27,7 @@ const activeGenre = ref(null)
 const topRankItems = ref([])
 const trendingRef = ref(null)
 
-// --- 🏷️ POPULAR GENRES LIST (CE STANDARD) ---
+// --- 🏷️ POPULAR GENRES LIST ---
 const QUICK_GENRES = [
   { id: 1, name: 'Action' }, { id: 2, name: 'Adventure' }, { id: 4, name: 'Comedy' },
   { id: 8, name: 'Drama' }, { id: 10, name: 'Fantasy' }, { id: 22, name: 'Romance' },
@@ -60,7 +63,8 @@ const handleQuickBookmark = (e, item) => {
     libraryStore.removeFromLibrary(item.mal_id)
     triggerToast('Removed from Collection', 'remove')
   } else {
-    libraryStore.addToLibrary({ ...item, category: 'anime', addedAt: new Date().toISOString() })
+    const category = (activeTab.value === 'manga' || activeTab.value === 'novel') ? 'manga' : 'anime'
+    libraryStore.addToLibrary({ ...item, category, addedAt: new Date().toISOString() })
     triggerToast('Added to Collection', 'add')
   }
 }
@@ -74,21 +78,21 @@ const loadMainContent = async (type, genreId = null) => {
   const filterParams = genreId ? { genres: genreId.toString() } : {}
 
   if (type === 'tv') {
-    if (genreId) await search('', 'anime', { ...filterParams, type: 'tv', order_by: 'score' })
-    else await fetchTrending('anime', 1, 'airing')
+    if (genreId) await archiveEngine.search('', 'anime', { ...filterParams, type: 'tv', order_by: 'score' })
+    else await archiveEngine.fetchTrending('anime', 1, 'airing')
   } 
   else if (type === 'movie') {
-    await search('', 'anime', { ...filterParams, type: 'movie', order_by: 'score', sort: 'desc' })
+    await archiveEngine.search('', 'anime', { ...filterParams, type: 'movie', order_by: 'score', sort: 'desc' })
   } 
   else if (type === 'manga') {
-    if (genreId) await search('', 'manga', { ...filterParams, type: 'manga', order_by: 'score' })
-    else await fetchTrending('manga', 1, 'bypopularity')
+    if (genreId) await archiveEngine.search('', 'manga', { ...filterParams, type: 'manga', order_by: 'score' })
+    else await archiveEngine.fetchTrending('manga', 1, 'bypopularity')
   } 
   else if (type === 'novel') {
-    await search('', 'manga', { ...filterParams, type: 'lightnovel', order_by: 'popularity', sort: 'desc' })
+    await archiveEngine.search('', 'manga', { ...filterParams, type: 'lightnovel', order_by: 'popularity', sort: 'desc' })
   } 
   else if (type === 'donghua') {
-    await search('', 'anime', { ...filterParams, type: 'ona', order_by: 'popularity', sort: 'desc' })
+    await archiveEngine.search('', 'anime', { ...filterParams, type: 'ona', order_by: 'popularity', sort: 'desc' })
   }
 }
 
@@ -99,11 +103,22 @@ const scrollTrending = (direction) => {
   }
 }
 
+// --- 🛡️ IMPROVED LIFECYCLE ---
 onMounted(async () => {
+  // 1. Load Konten Bawah dulu
   await loadMainContent('tv')
-  const { fetchTrending: fetchGlobal } = useJikan()
-  const res = await fetchGlobal('anime', 1, 'favorite')
-  topRankItems.value = res?.slice(0, 10) || []
+  
+  // 2. Jeda agar tidak kena Rate Limit (429)
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  // 3. Load Hall of Fame pakai Instance terpisah
+  const globalEngine = useJikan()
+  try {
+    const res = await globalEngine.fetchTrending('anime', 1, 'favorite')
+    topRankItems.value = res?.slice(0, 10) || []
+  } catch (err) {
+    console.error("Hall of Fame sync error:", err)
+  }
 })
 </script>
 
@@ -115,7 +130,7 @@ onMounted(async () => {
            class="fixed top-12 left-1/2 -translate-x-1/2 z-[1000] px-8 py-4 rounded-2xl backdrop-blur-2xl border border-white/10 shadow-2xl flex items-center gap-4 min-w-[320px]"
            :class="toast.type === 'add' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'">
         <div class="w-2 h-2 rounded-full animate-pulse" :class="toast.type === 'add' ? 'bg-emerald-400' : 'bg-red-400'"></div>
-        <span class="text-[11px] font-black uppercase tracking-[0.2em] italic">{{ toast.message }}</span>
+        <span class="text-[11px] font-black uppercase tracking-[0.2em] ">{{ toast.message }}</span>
       </div>
     </Transition>
 
@@ -132,7 +147,7 @@ onMounted(async () => {
       <div class="flex items-center gap-6 bg-white/[0.02] border border-white/5 p-4 rounded-[2rem] backdrop-blur-xl">
         <div class="flex flex-col text-right px-4">
           <span class="text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">Archived Items</span>
-          <span class="text-xl font-black text-white tabular-nums tracking-tighter">{{ libraryStore.totalItems }} <span class="text-[10px] opacity-20 italic">Units</span></span>
+          <span class="text-xl font-black text-white tabular-nums tracking-tighter">{{ libraryStore.totalItems }} <span class="text-[10px] opacity-20 ">Units</span></span>
         </div>
         <button @click="router.push('/library')" 
                 :style="{ backgroundColor: primaryColor }"
@@ -146,7 +161,7 @@ onMounted(async () => {
       <div class="flex items-center justify-between mb-12">
         <div class="flex items-center gap-4">
            <div class="w-1 h-4 rounded-full bg-white/10"></div>
-           <h2 class="text-sm font-black uppercase tracking-[0.5em] text-white/30 italic">Hall of Fame</h2>
+           <h2 class="text-sm font-black uppercase tracking-[0.5em] text-white/30 ">Hall of Fame</h2>
         </div>
         <div class="flex items-center gap-3">
             <button @click="scrollTrending('left')" class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
@@ -159,7 +174,11 @@ onMounted(async () => {
       </div>
 
       <div ref="trendingRef" class="flex gap-8 overflow-x-auto pb-14 scrollbar-hide snap-x relative z-10">
-        <div v-for="(item, idx) in topRankItems" :key="item.mal_id" 
+        <template v-if="topRankItems.length === 0">
+           <div v-for="n in 5" :key="n" class="flex-shrink-0 w-48 md:w-56 aspect-[3/4.4] rounded-[2.5rem] bg-white/5 animate-pulse"></div>
+        </template>
+
+        <div v-else v-for="(item, idx) in topRankItems" :key="item.mal_id" 
              @click="router.push(`/anime/${item.mal_id}`)"
              class="flex-shrink-0 w-48 md:w-56 snap-start group cursor-pointer relative">
           <div class="relative aspect-[3/4.4] rounded-[2.5rem] overflow-hidden border-4 border-white/5 shadow-2xl transition-all duration-700 group-hover:-translate-y-4">
@@ -173,7 +192,7 @@ onMounted(async () => {
              </button>
              <div class="absolute bottom-6 left-6 right-6">
                 <p class="text-[9px] font-black text-brand-primary uppercase tracking-[0.3em] mb-2">{{ item.type }}</p>
-                <h4 class="text-sm font-black text-white uppercase line-clamp-1 italic">{{ item.title }}</h4>
+                <h4 class="text-sm font-black text-white uppercase line-clamp-1 ">{{ item.title }}</h4>
              </div>
           </div>
         </div>
@@ -183,11 +202,11 @@ onMounted(async () => {
     <section class="max-w-7xl mx-auto px-8 relative z-10">
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-12">
         <div class="space-y-4">
-           <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-none">
-             Discovery <span class="opacity-20 italic">Archive.</span>
+           <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase  leading-none">
+             Discovery <span class="opacity-20 ">Archive.</span>
            </h3>
            <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.5em] flex items-center gap-3">
-             <span class="w-6 h-0.5" :class="theme.bg"></span> Now Viewing: {{ theme.label }} {{ activeGenre ? `• ${QUICK_GENRES.find(g => g.id === activeGenre).name}` : '' }}
+             <span class="w-6 h-0.5" :class="theme.bg"></span> Engine: Jikan v4
            </p>
         </div>
 
@@ -195,7 +214,7 @@ onMounted(async () => {
            <button v-for="type in ['tv', 'movie', 'manga', 'novel', 'donghua']" :key="type"
              @click="loadMainContent(type)" 
              :class="activeTab === type ? [theme.bg, 'text-white shadow-xl scale-105'] : 'text-text-muted hover:text-white'" 
-             class="px-10 md:px-12 py-4 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all italic whitespace-nowrap">
+             class="px-10 md:px-12 py-4 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all  whitespace-nowrap">
              {{ type }}
            </button>
         </div>
@@ -231,7 +250,7 @@ onMounted(async () => {
 
       <div v-else class="py-32 flex flex-col items-center justify-center text-center">
         <i class="fa-solid fa-box-open text-5xl text-white/5 mb-6"></i>
-        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">No Records in this Genre</p>
+        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">No Records Found</p>
       </div>
     </section>
 

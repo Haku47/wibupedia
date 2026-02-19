@@ -1,17 +1,22 @@
 <script setup>
-import { computed } from 'vue'
-import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { computed, ref } from 'vue' // Tambah ref
 import { APP_CONFIG } from '@/core/constants/APP_CONFIG'
 import { useUserStore } from '@/store/userStore.js'
 
+// KODE ASLI DIPERTAHANKAN
 const userStore = useUserStore()
 const primaryColor = computed(() => userStore.preferences?.primaryColor || '#3b82f6')
 
-const {
-  offlineReady,
-  needRefresh,
-  updateServiceWorker,
-} = useRegisterSW()
+/** * REVISI: useRegisterSW() dihapus agar tidak error virtual module.
+ * Status dibuat false agar UI tidak muncul karena PWA sudah dicopot.
+ */
+const offlineReady = ref(false)
+const needRefresh = ref(false)
+
+const updateServiceWorker = () => {
+  // Fungsi sementara agar tidak error saat di-klik
+  console.log('PWA is currently disabled')
+}
 
 const close = () => {
   offlineReady.value = false
@@ -68,7 +73,7 @@ const close = () => {
 <style scoped>
 .font-outfit { font-family: 'Outfit', sans-serif; }
 
-/* 🚀 SMOOTH TRANSITIONS */
+/* 🚀 SMOOTH TRANSITIONS ASLI */
 .slide-up-enter-active, .slide-up-leave-active {
   transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -78,7 +83,6 @@ const close = () => {
   filter: blur(20px);
 }
 
-/* Chrome/Safari Hide scrollbar */
 ::-webkit-scrollbar {
   display: none;
 }
