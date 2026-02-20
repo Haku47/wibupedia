@@ -1,7 +1,7 @@
 # 🌌 WibuPedia Community Hub — v2.0.7
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Version-2.0.0-10b981?style=for-the-badge&logo=target" alt="Version">
+  <img src="https://img.shields.io/badge/Version-2.0.7-10b981?style=for-the-badge&logo=target" alt="Version">
   <img src="https://img.shields.io/badge/Status-Stable-emerald?style=for-the-badge" alt="Status">
   <img src="https://img.shields.io/badge/License-MIT-white?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Build-Production-3b82f6?style=for-the-badge" alt="Build">
@@ -75,6 +75,7 @@ npm install
 
 # Jalankan server pengembangan
 npm run dev
+
 
 
 
