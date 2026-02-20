@@ -8,7 +8,7 @@
 </p>
 
 > **Project Base:** Malang, East Java, Indonesia  
-> **Development Hub:** WibuPedia Research Center  
+> **Development Hub:** WibuPedia 
 > **Release Class:** Major Stable Release (v2.x)
 
 WibuPedia adalah **Personal Anime & Manga Archive** kelas premium yang dirancang untuk kolektor yang mengapresiasi estetika dan fungsionalitas. Menjunjung tinggi **Community Standard**, aplikasi ini menghadirkan pengalaman visual *High-Fidelity* dengan sistem manajemen koleksi yang cerdas, cepat, dan sepenuhnya berada dalam kendali pengguna (**Local-First Data**).
@@ -70,3 +70,4 @@ npm install
 
 # Jalankan server pengembangan
 npm run dev
+
