@@ -7,11 +7,16 @@
   <img src="https://img.shields.io/badge/Build-Production-3b82f6?style=for-the-badge" alt="Build">
 </p>
 
-> **Project Base:** Malang, East Java, Indonesia  
-> **Development Hub:** WibuPedia 
-> **Release Class:** Major Stable Release (v2.x)
-
 WibuPedia adalah **Personal Anime & Manga Archive** kelas premium yang dirancang untuk kolektor yang mengapresiasi estetika dan fungsionalitas. Menjunjung tinggi **Community Standard**, aplikasi ini menghadirkan pengalaman visual *High-Fidelity* dengan sistem manajemen koleksi yang cerdas, cepat, dan sepenuhnya berada dalam kendali pengguna (**Local-First Data**).
+
+🛡️ Development Hub Info
+---
+
+>    Lead Developer: Haku47
+> 
+>    Location: Malang, East Java, Indonesia 🇮🇩
+> 
+>    Status: Active Development
 
 ---
 
@@ -70,4 +75,5 @@ npm install
 
 # Jalankan server pengembangan
 npm run dev
+
 
